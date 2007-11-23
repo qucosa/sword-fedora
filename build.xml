@@ -1,0 +1,76 @@
+<project name="sword" default="jar" basedir=".">
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="lib" location="lib"/>
+  <property name="conf" location="conf"/>
+  <property name="build" location="build"/>
+  <property name="tomcat"  location="/usr/local/jakarta-tomcat-5.0.28"/>
+
+  <target name="clean" description="clean up" >
+    <delete dir="${build}"/>
+  </target>
+
+   <path id="base.path">
+      <pathelement location="${build}/classes"/>
+      <pathelement location="${tomcat}/common/lib/servlet-api.jar"/>
+      <fileset dir="${lib}">
+        <include name="**/*.jar"/>
+      </fileset>
+   </path>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build}/classes"/>
+  </target>
+
+  <target name="compile" depends="init" description="compile the source" >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac compiler="javac1.5" srcdir="${src}" destdir="${build}/classes" classpathref="base.path" nowarn="yes">
+		 <!--<compilerarg value="-Xlint:unchecked"/> -->
+	 </javac>
+  </target>
+
+  <target name="jar" depends="compile" description="generate the distribution" >
+    <jar jarfile="${build}/sword-fedora.jar" basedir="${build}/classes"/>
+  </target>
+
+  <target name="war" depends="jar" description="Generates War">
+  		<mkdir dir="${build}/${ant.project.name}" />	
+		<mkdir dir="${build}/${ant.project.name}/WEB-INF" />	
+		<mkdir dir="${build}/${ant.project.name}/WEB-INF/lib" />	
+		<mkdir dir="${build}/${ant.project.name}/WEB-INF/classes" />	
+
+		
+		<copy todir="${build}/${ant.project.name}/WEB-INF/lib">	
+			<fileset dir="${lib}" includes="**/*.jar" />
+		</copy>
+
+		<copy file="${build}/sword-fedora.jar" todir="${build}/${ant.project.name}/WEB-INF/lib" />	
+
+		<copy todir="${build}/${ant.project.name}/WEB-INF">	
+			<fileset dir="${conf}" includes="*" />
+		</copy>
+
+		<jar jarfile="${build}/${ant.project.name}.war" basedir="${build}/${ant.project.name}"/>
+  </target>
+
+  <target name="dist" depends="war" description="Copies war to tomcat location">
+  		<copy file="${build}/${ant.project.name}.war" todir="${tomcat}/webapps/" />
+  </target>
+
+  <target name="javadoc" description="Builds api">
+
+	  <mkdir dir="doc/api"/>
+	  <javadoc
+			  destdir="doc/api"
+			  author="true"
+			  version="true"
+			  use="true"
+			  windowtitle="Fedora SWORD">
+
+		  <fileset dir="${src}" defaultexcludes="yes">
+			  <include name="org/**"/>
+		  </fileset>
+	  </javadoc>
+  </target>
+</project>

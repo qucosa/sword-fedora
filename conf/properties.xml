@@ -1,0 +1,94 @@
+<properties>
+	<!-- Fedora Properties the username and password for fedora are the ones supplied in the deposit and are not in this config file-->
+	<fedora>
+		<!-- This is the URL that should be returned to the client as a link to the object -->
+		<external_obj_url>http://glen.dnsalias.org:8080/fedora/get/##PID##</external_obj_url>
+		<!-- This is the URL that should point to a copy of the thing the deposited -->
+		<external_ds_url>http://glen.dnsalias.org:8080/fedora/get/##PID##/##DS##</external_ds_url>
+		<protocol>http</protocol>
+		<host>localhost</host>
+		<port>8080</port>
+		<!-- Namespace for pids specified in the fedora.fcfg attribute pidNamespace-->
+		<pid_namespace>sword</pid_namespace>
+	</fedora>
+	<general>
+		<!-- Return a URI for the reposiotry (used in atom:generator) -->
+		<reposiotry_uri>http://glen.dnsalias.org/sword</reposiotry_uri>
+		<!-- Directory where zip files are extracted and uploads are stored before ingest. This should be an absolute path -->
+		<temp_dir>/usr/local/tomcat/temp/</temp_dir>
+	</general>
+	<file_handlers>
+		<!--
+			Group of classes which handle ingesting specific files into Fedora 
+			You can add your own classes as long as they implement 
+				org.purl.sword.server.fedora.fileHandlers.FileHandler interface 
+			and have a default constructor
+		-->
+		<handler class="org.purl.sword.server.fedora.fileHandlers.JpegHandler" />
+		<handler class="org.purl.sword.server.fedora.fileHandlers.METSFileHandler" />
+		<handler class="org.purl.sword.server.fedora.fileHandlers.ZipFileHandler" />
+		<handler class="org.purl.sword.server.fedora.fileHandlers.ZipMETSFileHandler" />
+	</file_handlers>
+	<files>
+		<!-- XML list of file extension to mime-type conversions -->
+		<mime-type>WEB-INF/mime-types.xml</mime-type>
+	</files>
+	<!-- This is where you configure the service document requests 
+		For further details on what the mean go to: http://www.ukoln.ac.uk/repositories/digirep/index/SWORD_APP_Profile_1.0
+	-->
+	<service_document>
+		<level>1</level>
+		<noOp>true</noOp>
+		<verbose>true</verbose> 
+		<workspace title="Fedora SWORD Workspace">
+			<!-- 
+				collection_pid is the pid of the collection where deposits will end up
+			-->
+			<collection collection_pid="collection:open" mediation="true" mediationSet="true" formatNamespace="uri">
+				<!-- 
+					This is the URL which listens for deposit requests
+					##COLLECTION_PID## is overwritten at runtime to contain the value of collection_pid
+				-->
+				<deposit_url>http://glen.dnsalias.org/sword/deposit/##COLLECTION_PID##</deposit_url>
+				<users/>
+				<title>Open Collection</title>
+				<abstract>This is a collection of objects which can be freely deposited to. This is aviable for the SWORD test project</abstract>
+				<policy>This collection accepts any deposit from anyone</policy>
+				<treatment>Preservation actions may occur on submited deposits</treatment>
+				<accepts> <!-- list of mime types that are accepted by the collection -->
+					<accept>text/xml</accept>
+					<accept>application/zip</accept>
+					<accept>application/x-zip-compressed</accept> 
+					<accept>application/atom+xml</accept> 
+					<accept>image/gif</accept> 
+					<accept>image/jpeg</accept> 
+					<accept>image/jpg</accept> 
+				</accepts>
+			</collection>
+			<collection collection_pid="collection:closed" mediation="true" mediationSet="true" formatNamespace="uri">
+				<deposit_url>http://glen.dnsalias.org/sword/deposit/##COLLECTION_PID##</deposit_url>
+				<!-- 
+					This collection only allows deposits from gmr you can deposit as gmr
+					either by setting the on Behalf of parameter as gmr or by using the username gmr. Users are added using
+					the Fedora methods for controlling users.
+				-->
+				<users>
+					<user>gmr</user>
+				</users>
+				<title>Closed Collection</title>
+				<abstract>This is a collection of objects which only allows deposit by gmr. This is aviable for the SWORD test project</abstract>
+				<policy>This collection accepts any deposit from gmr</policy>
+				<treatment>Preservation actions may occur on submited deposits</treatment>
+				<accepts>
+					<accept>text/xml</accept>
+					<accept>application/zip</accept>
+					<accept>application/atom+xml</accept> 
+					<accept>image/gif</accept> 
+					<accept>image/jpeg</accept> 
+					<accept>image/jpg</accept> 
+					<accept>application/x-zip-compressed</accept> 
+				</accepts>
+			</collection>
+		</workspace>
+	</service_document>
+</properties>
