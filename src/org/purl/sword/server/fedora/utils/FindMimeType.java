@@ -86,11 +86,15 @@ public class FindMimeType {
 
 
 		try {
-			LOG.debug("Running XPath //type[./extension = '" + pExtension + "']/mime-type");
+			LOG.debug("Running XPath //type[./extension = '" + pExtension.toLowerCase() + "']/mime-type");
 			
-			Element tMimeTypeNode = (Element)XPath.selectSingleNode(_mimeTypes, "//type[./extension = '" + pExtension + "']/mime-type");
-			LOG.debug("sending mime-type " + tMimeTypeNode.getText() + " for extension " + pExtension);
-			return tMimeTypeNode.getText();
+			Element tMimeTypeNode = (Element)XPath.selectSingleNode(_mimeTypes, "//type[./extension = '" + pExtension.toLowerCase() + "']/mime-type");
+			if (tMimeTypeNode == null) {
+				return "application/octet-stream";
+			} else {	
+				LOG.debug("sending mime-type " + tMimeTypeNode.getText() + " for extension " + pExtension);
+				return tMimeTypeNode.getText();
+			}	
 		} catch (JDOMException tJDOMExcpt) {
 			LOG.error("Couldn't find extension " + tJDOMExcpt.toString());
 			return "application/octet-stream";
