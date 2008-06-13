@@ -4,10 +4,10 @@ CONTENTS
 1. INSTALL
 1.1 REQUIREMENTS
 1.2 DOWNLOAD AND EXTRACT
-1.2 EDITING THE CONFIGURATION FILE
-1.3 EDIT THE BUILD FILE
-1.4 RUN THE BUILD SCRIPT
-1.5 VIEW RESULTS
+1.3 EDITING THE CONFIGURATION FILE
+1.4 EDIT THE BUILD FILE
+1.5 RUN THE BUILD SCRIPT
+1.6 VIEW RESULTS
 2. MAINTENANCE
 2.1 ADDING USERS
 3. EXTENDING THE FEDORA CODE BASE
@@ -85,7 +85,7 @@ ant dist
 1.6 View Results
 -----------------
 
-Point the client to http://TOMCAT_HOST:TOMCAT_PORT/sword/servicedocument to retrieve a service document (this link also work in a web browser). If you haven't added any new users you can use the fedoraAdmin username and password.
+Point the client to http://TOMCAT_HOST:TOMCAT_PORT/sword/app/servicedocument to retrieve a service document (this link also work in a web browser). If you haven't added any new users you can use the fedoraAdmin username and password.
 
 Where
  * TOMCAT_HOST is the public host name for the tomcat server where the sword code is installed. This can be the Fedora installed tomcat
