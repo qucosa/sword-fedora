@@ -176,7 +176,7 @@ public class FedoraObject {
 		return _datastreams;
 	}
 
-	public void setDatastreams(final List pDatastreams) {
+	public void setDatastreams(final List<Datastream> pDatastreams) {
 		_datastreams = pDatastreams;
 	}
 
@@ -184,7 +184,7 @@ public class FedoraObject {
 		return _disseminators;
 	}
 
-	public void setDisseminators(final List pDisseminators) {
+	public void setDisseminators(final List<Disseminator> pDisseminators) {
 		_disseminators = pDisseminators;
 	}
 

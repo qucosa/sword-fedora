@@ -93,6 +93,8 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(DefaultFileHandler.class);
@@ -140,7 +142,9 @@ public class DefaultFileHandler implements FileHandler {
 		tNewObject.setDC(this.getDublinCore(pDeposit));
 		tNewObject.setRelationships(this.getRelationships(pDeposit));
 		try {
-			tNewObject.setDatastreams(this.getDatastreams(pDeposit));
+			List<Datastream> tDatastreamList = this.getDatastreams(pDeposit);
+			this.ensureValidDSIds(tDatastreamList);
+			tNewObject.setDatastreams(tDatastreamList);
 		} catch (IOException tIOExcpt) {
 			tIOExcpt.printStackTrace();
 			LOG.debug("Excpetion");
@@ -223,6 +227,28 @@ public class DefaultFileHandler implements FileHandler {
 		tRelation.add("isMemberOf", pDeposit.getCollectionPid());
 
 		return tRelation;
+	}
+
+	/**
+	 * This method ensures the datastream names are unique. If a duplicate is found then it will append
+	 * a number to it to make it unique. 
+	 * 
+	 * @param List<Datastream> the list of datastreams to be added
+	 */
+	protected void ensureValidDSIds(final List<Datastream> pDatastreamList) {
+		Map<String,Integer> tDatastreamNames = new HashMap<String,Integer>(pDatastreamList.size());
+
+		for (Datastream tDatastream : pDatastreamList) {
+			LOG.debug("Checking " + tDatastream.getId());
+			tDatastream.setId(this.getValidFileName(tDatastream.getId()));
+	
+			if (tDatastreamNames.get(tDatastream.getId()) == null) {
+				tDatastreamNames.put(tDatastream.getId(), 1);
+			} else {
+				tDatastreamNames.put(tDatastream.getId(), tDatastreamNames.get(tDatastream.getId()) + 1);
+				tDatastream.setId(tDatastream.getId() + "-" + tDatastreamNames.get(tDatastream.getId()));
+			}
+		}
 	}
 
 	/**
@@ -512,13 +538,24 @@ public class DefaultFileHandler implements FileHandler {
 		if (pDeposit.getFilename() == null) {
 			tFilename = "upload";
 		} else {
-			tFilename = pDeposit.getFilename();
-/*			if (pDeposit.getFilename().indexOf("=") != -1) {
-				tFilename = pDeposit.getFilename().split("=")[1];
-			} else {
-				tFilename = pDeposit.getFilename().replaceAll(":", "");
-			}	*/
+			tFilename = this.getValidFileName(pDeposit.getFilename());
 		}
+		return tFilename;
+	}
+
+	protected String getValidFileName(final String pName) {
+		String tFilename = pName;
+		if (!(pName.matches("[a-z].*") || pName.matches("[A-Z].*") || pName.matches("\\_.*"))) {
+			LOG.debug("datastream name must begin with a letter or _");
+			tFilename = "Uploaded-" + pName;
+		}
+
+		if (tFilename.indexOf(".") != -1) {
+			// Remove extension
+			tFilename = tFilename.substring(0, tFilename.indexOf("."));
+		}	
+
+		LOG.debug("Replacing filename: " + pName + " with " + tFilename);
 		return tFilename;
 	}
 }
