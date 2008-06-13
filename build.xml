@@ -4,7 +4,7 @@
   <property name="lib" location="lib"/>
   <property name="conf" location="conf"/>
   <property name="build" location="build"/>
-  <property name="tomcat"  location="/usr/local/jakarta-tomcat-5.0.28"/>
+  <property name="tomcat"  location="/usr/local/tomcat"/>
 
   <target name="clean" description="clean up" >
     <delete dir="${build}"/>
@@ -26,7 +26,7 @@
   <target name="compile" depends="init" description="compile the source" >
     <!-- Compile the java code from ${src} into ${build} -->
     <javac compiler="javac1.5" srcdir="${src}" destdir="${build}/classes" classpathref="base.path" nowarn="yes">
-		 <!--<compilerarg value="-Xlint:unchecked"/> -->
+		 <compilerarg value="-Xlint:unchecked"/> 
 	 </javac>
   </target>
 
