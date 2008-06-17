@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
 import java.util.Enumeration;
+import java.util.Random;
 
 import org.purl.sword.server.fedora.utils.FindMimeType;
 import org.purl.sword.server.fedora.fedoraObjects.Datastream;
@@ -65,7 +66,7 @@ import org.apache.log4j.Logger;
 
 public class ZipFileAccess {
 	private static final Logger LOG = Logger.getLogger(ZipFileAccess.class);
-	protected String _tempDir = "";
+	protected String _tmpExtractDirName = "";
 
 	/**
 	 * Setup this object and tell it where it can extract the zip file to.
@@ -73,25 +74,26 @@ public class ZipFileAccess {
 	 * @param String the location where the zip file can be extracted to.
 	 */
 	public ZipFileAccess(final String pTempDir) {
-		this.setTempDir(pTempDir);
+		this.setTmpDir(pTempDir);
 	}
 
 	/**
-	 * Get tempDir.
+	 * Get tempLocation.
 	 *
-	 * @return tempDir as String.
+	 * @return tempLocation as String.
 	 */
-	public String getTempDir() {
-	    return _tempDir;
+	public String getTmpExtractDirName() {
+	    return _tmpExtractDirName;
 	}
 	
 	/**
-	 * Set tempDir.
+	 * Set tempLocation.
 	 *
-	 * @param tempDir the value to set.
+	 * @param tempLocation the value to set.
 	 */
-	public void setTempDir(final String pTempDir) {
-	     _tempDir = pTempDir;
+	public void setTmpDir(final String pTempDir) {
+			Random tRand = new Random();
+	     _tmpExtractDirName = pTempDir + "zip-extract-" + tRand.nextInt();
 	}
 
 	/** 
@@ -104,8 +106,7 @@ public class ZipFileAccess {
 	public List<Datastream> getFiles(final String pFile) throws IOException {
 		List<Datastream> tDatastreams = new ArrayList<Datastream>();
 		
-		String tZipExtractDir = this.getTempDir() + "zip-extract";
-		new File(tZipExtractDir).mkdir();
+		new File(this.getTmpExtractDirName()).mkdir();
 		ZipFile tZipFile = new ZipFile(pFile);
 
 		Enumeration tEntries = tZipFile.entries();
@@ -122,7 +123,7 @@ public class ZipFileAccess {
 				continue;
 			}
 
-			tFileLocation = tZipExtractDir + System.getProperty("file.separator") + tEntry.getName();
+			tFileLocation = this.getTmpExtractDirName() + System.getProperty("file.separator") + tEntry.getName();
 			tFile = new File(tFileLocation);
 			LOG.debug("Saving " + tEntry.getName() + " to " + tFile.getPath());
 			tFile.getParentFile().mkdirs();
@@ -145,7 +146,7 @@ public class ZipFileAccess {
 	 * @throws SWORDException if a file is present in the extract of the zip file after ingest has taken place
 	 */ 
 	public void removeLocalFiles() throws SWORDException {
-		this.recursiveDelete(new File(this.getTempDir() + "zip-extract"));
+		this.recursiveDelete(new File(this.getTmpExtractDirName()));
 	}
 
 	/**
