@@ -8,7 +8,7 @@
   </description>
 
   <context-param>
-    <param-name>server-class</param-name>
+    <param-name>sword-server-class</param-name>
     <param-value>org.purl.sword.server.fedora.FedoraServer</param-value>
     <description>
       The SWORSServer class name
