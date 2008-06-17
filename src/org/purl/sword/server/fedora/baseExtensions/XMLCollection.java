@@ -58,6 +58,7 @@ public class XMLCollection extends Collection {
 
 	protected String _collectionPid = "";
 
+@SuppressWarnings(value={"unchecked"})
 	public XMLCollection(final Element pCollectionEl) {
 		super();
 
@@ -67,10 +68,8 @@ public class XMLCollection extends Collection {
 		super.setLocation(tLocation.replaceAll("##COLLECTION_PID##", _collectionPid));
 		super.setTitle(pCollectionEl.getChild("title").getText());
 
-		Iterator<Element> tAcceptsIter = pCollectionEl.getChild("accepts").getChildren().iterator(); 
-	
-		while (tAcceptsIter.hasNext()) {
-			super.addAccepts(tAcceptsIter.next().getText());
+		for (Element tAcceptsEl : (List<Element>)pCollectionEl.getChild("accepts").getChildren()) {
+			super.addAccepts(tAcceptsEl.getText());
 		}
 
 		super.setCollectionPolicy(pCollectionEl.getChild("policy").getText());

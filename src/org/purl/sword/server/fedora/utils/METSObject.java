@@ -170,17 +170,15 @@ public class METSObject {
 	 * @return List<Datastream> a list of the metadata datastreams
 	 * @throws JDOMException  if there was a problem processing the METS document
 	 */
+@SuppressWarnings(value={"unchecked"})
 	public List<Datastream> getMetadataDatastreams() throws JDOMException {
 		List<Datastream> tDatastreamList = new ArrayList<Datastream>();
 
 		LOG.debug("Adding MD as streams");
 		// Add metadata as seperate streams
-		Iterator<Element> tDMDSecIter = _METSDoc.getRootElement().getChildren("dmdSec", METS).iterator();
-		Element tDMDSecEl = null;
 		String tMDName = "";
 		Document tNewMDDoc = null;
-		while (tDMDSecIter.hasNext()) {
-			tDMDSecEl = tDMDSecIter.next();
+		for (Element tDMDSecEl : (List<Element>)_METSDoc.getRootElement().getChildren("dmdSec", METS)) {
 			
 			tNewMDDoc = new Document((Element)((Element)tDMDSecEl.getChild("mdWrap", METS).getChild("xmlData", METS).getChildren().get(0)).clone());
 			LOG.debug("Root is " + tNewMDDoc.getRootElement().getName());
@@ -206,22 +204,20 @@ public class METSObject {
 	 * @return List<Datastream> a list of the datastreams
 	 * @throws JDOMException  if there was a problem processing the METS document
 	 */
+@SuppressWarnings(value={"unchecked"})
 	public List<Datastream> getFileDatastreams() throws JDOMException {
 		List<Datastream> tDatastreamList = new ArrayList<Datastream>();
 
 		LOG.debug("Adding files");
 		XPath tPath = XPath.newInstance("//METS:file");
 		tPath.addNamespace(METS);
+
 		// Add files from METS document
-		Iterator<Element> tFilesIter = tPath.selectNodes(_METSDoc).iterator();
-		Element tFileEl = null;
 		String tID = "";
 		String tMimeType = "";
 		String tURL = "";
 		Datastream tNewDs = null;
-		while (tFilesIter.hasNext()) {
-			tFileEl = tFilesIter.next();
-
+		for (Element tFileEl : (List<Element>)tPath.selectNodes(_METSDoc)) {
 			tID = tFileEl.getAttributeValue("ID");
 			tMimeType = tFileEl.getAttributeValue("MIMETYPE");
 			tURL = tFileEl.getChild("FLocat", METS).getAttributeValue("href", XLINK);

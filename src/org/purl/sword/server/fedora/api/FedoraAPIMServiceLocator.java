@@ -110,6 +110,7 @@ public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service imp
 
     private java.util.HashSet ports = null;
 
+@SuppressWarnings(value={"unchecked"})
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();

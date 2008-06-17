@@ -91,14 +91,12 @@ public class XMLProperties {
 	 * @return List<String> list of class names (including package) for the file handler
 	 * @throws SWORDException if there was a problem reading the config file
 	 */
+@SuppressWarnings(value={"unchecked"})
 	public List<String> getFileHandlerClasses() throws SWORDException {
 		List<String> tClassesList = new ArrayList<String>();
 		
 		try {
-			Iterator<Element> tFileHandlerElIter = (Iterator<Element>)XPath.selectNodes(_props, "/properties/file_handlers/*").iterator();
-			Element tFileHandlerEl = null;
-			while (tFileHandlerElIter.hasNext()) {
-				tFileHandlerEl = tFileHandlerElIter.next();
+			for (Element tFileHandlerEl : (List<Element>)XPath.selectNodes(_props, "/properties/file_handlers/*")) {
 				if (tFileHandlerEl.getAttributeValue("class") == null || tFileHandlerEl.getAttributeValue("class").trim().length() == 0) {
 					throw new JDOMException("You must specify a class attribute for the node handler");
 				}

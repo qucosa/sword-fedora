@@ -64,6 +64,8 @@ import org.apache.log4j.Logger;
 public class XMLServiceDocument extends ServiceDocument implements ServiceDocumentQueries {
 	private static final Logger LOG = Logger.getLogger(XMLServiceDocument.class);
 	protected Element _serviceDocEl = null;
+
+@SuppressWarnings(value={"unchecked"})
 	public XMLServiceDocument(final Element pServiceDocEl, final String pUsername) {
 		super();
 
@@ -85,12 +87,9 @@ public class XMLServiceDocument extends ServiceDocument implements ServiceDocume
 		Workspace tWorkspace = new Workspace();
 		tWorkspace.setTitle(pServiceDocEl.getChild("workspace").getAttributeValue("title"));
 
-		List tXMLCollections = pServiceDocEl.getChild("workspace").getChildren();
+		List<Element> tXMLCollections = pServiceDocEl.getChild("workspace").getChildren();
 
-		Element tCollectionXML = null;
-		Iterator<Element> tCollectionIter = tXMLCollections.iterator();
-		while (tCollectionIter.hasNext()) {
-			tCollectionXML = tCollectionIter.next();
+		for (Element tCollectionXML : tXMLCollections) {
 			try {
 				LOG.debug("Looking for collecitons for user " + pUsername + " with XPath=" + "./users/user[./text() = '" + pUsername + "']");
 				if (tCollectionXML.getChild("users").getChildren().isEmpty() || XPath.selectSingleNode(tCollectionXML, "./users/user[./text() = '" + pUsername + "']") != null) {

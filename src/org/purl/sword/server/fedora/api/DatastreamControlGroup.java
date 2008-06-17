@@ -12,6 +12,7 @@ public class DatastreamControlGroup implements java.io.Serializable {
     private static java.util.HashMap _table_ = new java.util.HashMap();
 
     // Constructor
+@SuppressWarnings(value={"unchecked"})
     protected DatastreamControlGroup(java.lang.String value) {
         _value_ = value;
         _table_.put(_value_,this);

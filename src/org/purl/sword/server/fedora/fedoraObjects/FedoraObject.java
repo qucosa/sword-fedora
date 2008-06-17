@@ -81,7 +81,7 @@ public class FedoraObject {
 	private static final Logger LOG = Logger.getLogger(FedoraObject.class);
 	protected static Namespace FOXML = Namespace.getNamespace("foxml", "info:fedora/fedora-system:def/foxml#");
 	protected String _pid = "";
-	protected List _identifiers = null; 
+	protected List<Property> _identifiers = null; 
 	protected DublinCore _dc = null;
 	protected Relationship _relationship = null;
 	protected List<Datastream> _datastreams = null;
@@ -144,11 +144,11 @@ public class FedoraObject {
 		_pid = pPID;
 	}
 
-	public List getIdentifiers() {
+	public List<Property> getIdentifiers() {
 		return _identifiers;
 	}
 
-	public void setIdentifiers(final List pIdentifiers) {
+	public void setIdentifiers(final List<Property> pIdentifiers) {
 		_identifiers = pIdentifiers;
 	}
 
@@ -289,34 +289,31 @@ public class FedoraObject {
 	protected Element getObjectPropsXML() {
 		Element tObjectPropsEl = new Element("objectProperties", FOXML);
 
-		Iterator<Property> tPropertyIter = this.getIdentifiers().iterator();
-		while (tPropertyIter.hasNext()) {
-			tObjectPropsEl.addContent(tPropertyIter.next().toFOXML(FOXML));
+		for (Property tProp : this.getIdentifiers()) {
+			tObjectPropsEl.addContent(tProp.toFOXML(FOXML));
 		}
 
 		return tObjectPropsEl;
 	}
 
-	protected List addDSXML() {
-		List tDatastreamsList = new ArrayList();
+	protected List<Element> addDSXML() {
+		List<Element> tDatastreamsList = new ArrayList<Element>();
 		
 		tDatastreamsList.add(this.getDC().toFOXML(FOXML));
 		tDatastreamsList.add(this.getRelationships().toFOXML(FOXML));
 		
-		Iterator<Datastream> tDatastreamIter = this.getDatastreams().iterator();
-		while (tDatastreamIter.hasNext()) {
-			tDatastreamsList.add(tDatastreamIter.next().toFOXML(FOXML));
+		for (Datastream tDSXML : this.getDatastreams()) {
+			tDatastreamsList.add(tDSXML.toFOXML(FOXML));
 		}
 		
 		return tDatastreamsList;
 	}
 
-	protected List addDisseminatorsXML() {
-		List tDisseminatorsList = new ArrayList();
+	protected List<Element> addDisseminatorsXML() {
+		List<Element> tDisseminatorsList = new ArrayList<Element>();
 		
-		Iterator<Disseminator> tDisseminatorIter = this.getDisseminators().iterator();
-		while (tDisseminatorIter.hasNext()) {
-			tDisseminatorsList.add(tDisseminatorIter.next().toFOXML(FOXML));
+		for (Disseminator tDissXML : this.getDisseminators()) {
+			tDisseminatorsList.add(tDissXML.toFOXML(FOXML));
 		}
 		
 		return tDisseminatorsList;

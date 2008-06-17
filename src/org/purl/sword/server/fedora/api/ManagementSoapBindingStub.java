@@ -504,6 +504,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
          super.cachedEndpoint = endpointURL;
     }
 
+@SuppressWarnings(value={"unchecked"})
     public ManagementSoapBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
         if (service == null) {
             super.service = new org.apache.axis.client.Service();
