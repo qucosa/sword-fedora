@@ -2,22 +2,21 @@
  * DatastreamBindingMap.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
-package info.fedora.www.definitions._1._0.types;
+package org.purl.sword.server.fedora.api;
 
 public class DatastreamBindingMap  implements java.io.Serializable {
     private java.lang.String dsBindMapID;
 
-	private static final long serialVersionUID = 42L;
     private java.lang.String dsBindMechanismPID;
 
     private java.lang.String dsBindMapLabel;
 
     private java.lang.String state;
 
-    private info.fedora.www.definitions._1._0.types.DatastreamBinding[] dsBindings;
+    private org.purl.sword.server.fedora.api.DatastreamBinding[] dsBindings;
 
     public DatastreamBindingMap() {
     }
@@ -27,7 +26,7 @@ public class DatastreamBindingMap  implements java.io.Serializable {
            java.lang.String dsBindMechanismPID,
            java.lang.String dsBindMapLabel,
            java.lang.String state,
-           info.fedora.www.definitions._1._0.types.DatastreamBinding[] dsBindings) {
+           org.purl.sword.server.fedora.api.DatastreamBinding[] dsBindings) {
            this.dsBindMapID = dsBindMapID;
            this.dsBindMechanismPID = dsBindMechanismPID;
            this.dsBindMapLabel = dsBindMapLabel;
@@ -121,7 +120,7 @@ public class DatastreamBindingMap  implements java.io.Serializable {
      * 
      * @return dsBindings
      */
-    public info.fedora.www.definitions._1._0.types.DatastreamBinding[] getDsBindings() {
+    public org.purl.sword.server.fedora.api.DatastreamBinding[] getDsBindings() {
         return dsBindings;
     }
 
@@ -131,7 +130,7 @@ public class DatastreamBindingMap  implements java.io.Serializable {
      * 
      * @param dsBindings
      */
-    public void setDsBindings(info.fedora.www.definitions._1._0.types.DatastreamBinding[] dsBindings) {
+    public void setDsBindings(org.purl.sword.server.fedora.api.DatastreamBinding[] dsBindings) {
         this.dsBindings = dsBindings;
     }
 

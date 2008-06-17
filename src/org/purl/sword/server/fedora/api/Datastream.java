@@ -2,15 +2,14 @@
  * Datastream.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
-package info.fedora.www.definitions._1._0.types;
+package org.purl.sword.server.fedora.api;
 
 public class Datastream  implements java.io.Serializable {
-    private info.fedora.www.definitions._1._0.types.DatastreamControlGroup controlGroup;
+    private org.purl.sword.server.fedora.api.DatastreamControlGroup controlGroup;
 
-	private static final long serialVersionUID = 42L;
     private java.lang.String ID;
 
     private java.lang.String versionID;
@@ -41,7 +40,7 @@ public class Datastream  implements java.io.Serializable {
     }
 
     public Datastream(
-           info.fedora.www.definitions._1._0.types.DatastreamControlGroup controlGroup,
+           org.purl.sword.server.fedora.api.DatastreamControlGroup controlGroup,
            java.lang.String ID,
            java.lang.String versionID,
            java.lang.String[] altIDs,
@@ -77,7 +76,7 @@ public class Datastream  implements java.io.Serializable {
      * 
      * @return controlGroup
      */
-    public info.fedora.www.definitions._1._0.types.DatastreamControlGroup getControlGroup() {
+    public org.purl.sword.server.fedora.api.DatastreamControlGroup getControlGroup() {
         return controlGroup;
     }
 
@@ -87,7 +86,7 @@ public class Datastream  implements java.io.Serializable {
      * 
      * @param controlGroup
      */
-    public void setControlGroup(info.fedora.www.definitions._1._0.types.DatastreamControlGroup controlGroup) {
+    public void setControlGroup(org.purl.sword.server.fedora.api.DatastreamControlGroup controlGroup) {
         this.controlGroup = controlGroup;
     }
 

@@ -2,12 +2,12 @@
  * ManagementSoapBindingStub.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
-package info.fedora.www.definitions._1._0.api;
+package org.purl.sword.server.fedora.api;
 
-public class ManagementSoapBindingStub extends org.apache.axis.client.Stub implements info.fedora.www.definitions._1._0.api.FedoraAPIM {
+public class ManagementSoapBindingStub extends org.apache.axis.client.Stub implements org.purl.sword.server.fedora.api.FedoraAPIM {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
     private java.util.Vector cachedSerFactories = new java.util.Vector();
@@ -58,7 +58,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "id"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "UserInfo"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.UserInfo.class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.UserInfo.class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "userInfo"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -180,7 +180,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dissLabel"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "bindingMap"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBindingMap"), info.fedora.www.definitions._1._0.types.DatastreamBindingMap.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "bindingMap"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBindingMap"), org.purl.sword.server.fedora.api.DatastreamBindingMap.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dissState"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -270,7 +270,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dissLabel"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "bindingMap"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBindingMap"), info.fedora.www.definitions._1._0.types.DatastreamBindingMap.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "bindingMap"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBindingMap"), org.purl.sword.server.fedora.api.DatastreamBindingMap.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dissState"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -360,7 +360,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "asOfDateTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Datastream"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.Datastream.class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.Datastream.class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "datastream"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -375,7 +375,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dsState"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Datastream"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.Datastream[].class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.Datastream[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "datastream"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -388,7 +388,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dsID"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Datastream"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.Datastream[].class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.Datastream[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "datastream"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -408,7 +408,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "asOfDateTime"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Disseminator"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.Disseminator.class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.Disseminator.class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "disseminator"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -423,7 +423,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dissState"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Disseminator"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.Disseminator[].class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.Disseminator[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "disseminator"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -436,7 +436,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "dissID"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Disseminator"));
-        oper.setReturnClass(info.fedora.www.definitions._1._0.types.Disseminator[].class);
+        oper.setReturnClass(org.purl.sword.server.fedora.api.Disseminator[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "disseminator"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -518,15 +518,15 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
             java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
             java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
             java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
-            //java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
-            //java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
-            //java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
-            //java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
-            //java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
-            //java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
+            java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
+            java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
+            java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
+            java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
+            java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
+            java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/api/", "ArrayOf_tns1_DatastreamBinding");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.DatastreamBinding[].class;
+            cls = org.purl.sword.server.fedora.api.DatastreamBinding[].class;
             cachedSerClasses.add(cls);
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBinding");
             qName2 = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/api/", "item");
@@ -544,42 +544,42 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Datastream");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.Datastream.class;
+            cls = org.purl.sword.server.fedora.api.Datastream.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBinding");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.DatastreamBinding.class;
+            cls = org.purl.sword.server.fedora.api.DatastreamBinding.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamBindingMap");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.DatastreamBindingMap.class;
+            cls = org.purl.sword.server.fedora.api.DatastreamBindingMap.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "DatastreamControlGroup");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.DatastreamControlGroup.class;
+            cls = org.purl.sword.server.fedora.api.DatastreamControlGroup.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(enumsf);
             cachedDeserFactories.add(enumdf);
 
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "Disseminator");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.Disseminator.class;
+            cls = org.purl.sword.server.fedora.api.Disseminator.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://www.fedora.info/definitions/1/0/types/", "UserInfo");
             cachedSerQNames.add(qName);
-            cls = info.fedora.www.definitions._1._0.types.UserInfo.class;
+            cls = org.purl.sword.server.fedora.api.UserInfo.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -718,7 +718,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.UserInfo describeUser(java.lang.String id) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.UserInfo describeUser(java.lang.String id) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -742,9 +742,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.UserInfo) _resp;
+                return (org.purl.sword.server.fedora.api.UserInfo) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.UserInfo) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.UserInfo.class);
+                return (org.purl.sword.server.fedora.api.UserInfo) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.UserInfo.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -956,7 +956,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public java.lang.String addDisseminator(java.lang.String pid, java.lang.String bDefPID, java.lang.String bMechPID, java.lang.String dissLabel, info.fedora.www.definitions._1._0.types.DatastreamBindingMap bindingMap, java.lang.String dissState, java.lang.String logMessage) throws java.rmi.RemoteException {
+    public java.lang.String addDisseminator(java.lang.String pid, java.lang.String bDefPID, java.lang.String bMechPID, java.lang.String dissLabel, org.purl.sword.server.fedora.api.DatastreamBindingMap bindingMap, java.lang.String dissState, java.lang.String logMessage) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1058,7 +1058,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public java.lang.String modifyDisseminator(java.lang.String pid, java.lang.String dissID, java.lang.String bMechPID, java.lang.String dissLabel, info.fedora.www.definitions._1._0.types.DatastreamBindingMap bindingMap, java.lang.String dissState, java.lang.String logMessage, boolean force) throws java.rmi.RemoteException {
+    public java.lang.String modifyDisseminator(java.lang.String pid, java.lang.String dissID, java.lang.String bMechPID, java.lang.String dissLabel, org.purl.sword.server.fedora.api.DatastreamBindingMap bindingMap, java.lang.String dissState, java.lang.String logMessage, boolean force) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1228,7 +1228,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.Datastream getDatastream(java.lang.String pid, java.lang.String dsID, java.lang.String asOfDateTime) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.Datastream getDatastream(java.lang.String pid, java.lang.String dsID, java.lang.String asOfDateTime) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1252,9 +1252,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.Datastream) _resp;
+                return (org.purl.sword.server.fedora.api.Datastream) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.Datastream) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.Datastream.class);
+                return (org.purl.sword.server.fedora.api.Datastream) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.Datastream.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -1262,7 +1262,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.Datastream[] getDatastreams(java.lang.String pid, java.lang.String asOfDateTime, java.lang.String dsState) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.Datastream[] getDatastreams(java.lang.String pid, java.lang.String asOfDateTime, java.lang.String dsState) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1286,9 +1286,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.Datastream[]) _resp;
+                return (org.purl.sword.server.fedora.api.Datastream[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.Datastream[]) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.Datastream[].class);
+                return (org.purl.sword.server.fedora.api.Datastream[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.Datastream[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -1296,7 +1296,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.Datastream[] getDatastreamHistory(java.lang.String pid, java.lang.String dsID) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.Datastream[] getDatastreamHistory(java.lang.String pid, java.lang.String dsID) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1320,9 +1320,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.Datastream[]) _resp;
+                return (org.purl.sword.server.fedora.api.Datastream[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.Datastream[]) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.Datastream[].class);
+                return (org.purl.sword.server.fedora.api.Datastream[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.Datastream[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -1330,7 +1330,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.Disseminator getDisseminator(java.lang.String pid, java.lang.String dissID, java.lang.String asOfDateTime) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.Disseminator getDisseminator(java.lang.String pid, java.lang.String dissID, java.lang.String asOfDateTime) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1354,9 +1354,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.Disseminator) _resp;
+                return (org.purl.sword.server.fedora.api.Disseminator) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.Disseminator) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.Disseminator.class);
+                return (org.purl.sword.server.fedora.api.Disseminator) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.Disseminator.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -1364,7 +1364,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.Disseminator[] getDisseminators(java.lang.String pid, java.lang.String asOfDateTime, java.lang.String dissState) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.Disseminator[] getDisseminators(java.lang.String pid, java.lang.String asOfDateTime, java.lang.String dissState) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1388,9 +1388,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.Disseminator[]) _resp;
+                return (org.purl.sword.server.fedora.api.Disseminator[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.Disseminator[]) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.Disseminator[].class);
+                return (org.purl.sword.server.fedora.api.Disseminator[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.Disseminator[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -1398,7 +1398,7 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
 }
     }
 
-    public info.fedora.www.definitions._1._0.types.Disseminator[] getDisseminatorHistory(java.lang.String pid, java.lang.String dissID) throws java.rmi.RemoteException {
+    public org.purl.sword.server.fedora.api.Disseminator[] getDisseminatorHistory(java.lang.String pid, java.lang.String dissID) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1422,9 +1422,9 @@ public class ManagementSoapBindingStub extends org.apache.axis.client.Stub imple
         else {
             extractAttachments(_call);
             try {
-                return (info.fedora.www.definitions._1._0.types.Disseminator[]) _resp;
+                return (org.purl.sword.server.fedora.api.Disseminator[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (info.fedora.www.definitions._1._0.types.Disseminator[]) org.apache.axis.utils.JavaUtils.convert(_resp, info.fedora.www.definitions._1._0.types.Disseminator[].class);
+                return (org.purl.sword.server.fedora.api.Disseminator[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.purl.sword.server.fedora.api.Disseminator[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {

@@ -2,14 +2,13 @@
  * DatastreamControlGroup.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
-package info.fedora.www.definitions._1._0.types;
+package org.purl.sword.server.fedora.api;
 
 public class DatastreamControlGroup implements java.io.Serializable {
     private java.lang.String _value_;
-	private static final long serialVersionUID = 42L;
     private static java.util.HashMap _table_ = new java.util.HashMap();
 
     // Constructor

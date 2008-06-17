@@ -2,14 +2,13 @@
  * FedoraAPIMServiceLocator.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
-package info.fedora.www.definitions._1._0.api;
+package org.purl.sword.server.fedora.api;
 
-public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service implements info.fedora.www.definitions._1._0.api.FedoraAPIMService {
+public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service implements org.purl.sword.server.fedora.api.FedoraAPIMService {
 
-	private static final long serialVersionUID = 42L;
     public FedoraAPIMServiceLocator() {
     }
 
@@ -23,7 +22,7 @@ public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service imp
     }
 
     // Use to get a proxy class for management
-    private java.lang.String management_address = "http://192.168.0.3:8080/fedora/services/management";
+    private java.lang.String management_address = "http://localhost:8080/fedora/services/management";
 
     public java.lang.String getmanagementAddress() {
         return management_address;
@@ -40,7 +39,7 @@ public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service imp
         managementWSDDServiceName = name;
     }
 
-    public info.fedora.www.definitions._1._0.api.FedoraAPIM getmanagement() throws javax.xml.rpc.ServiceException {
+    public org.purl.sword.server.fedora.api.FedoraAPIM getmanagement() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
             endpoint = new java.net.URL(management_address);
@@ -51,9 +50,9 @@ public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service imp
         return getmanagement(endpoint);
     }
 
-    public info.fedora.www.definitions._1._0.api.FedoraAPIM getmanagement(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public org.purl.sword.server.fedora.api.FedoraAPIM getmanagement(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            info.fedora.www.definitions._1._0.api.ManagementSoapBindingStub _stub = new info.fedora.www.definitions._1._0.api.ManagementSoapBindingStub(portAddress, this);
+            org.purl.sword.server.fedora.api.ManagementSoapBindingStub _stub = new org.purl.sword.server.fedora.api.ManagementSoapBindingStub(portAddress, this);
             _stub.setPortName(getmanagementWSDDServiceName());
             return _stub;
         }
@@ -73,8 +72,8 @@ public class FedoraAPIMServiceLocator extends org.apache.axis.client.Service imp
      */
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (info.fedora.www.definitions._1._0.api.FedoraAPIM.class.isAssignableFrom(serviceEndpointInterface)) {
-                info.fedora.www.definitions._1._0.api.ManagementSoapBindingStub _stub = new info.fedora.www.definitions._1._0.api.ManagementSoapBindingStub(new java.net.URL(management_address), this);
+            if (org.purl.sword.server.fedora.api.FedoraAPIM.class.isAssignableFrom(serviceEndpointInterface)) {
+                org.purl.sword.server.fedora.api.ManagementSoapBindingStub _stub = new org.purl.sword.server.fedora.api.ManagementSoapBindingStub(new java.net.URL(management_address), this);
                 _stub.setPortName(getmanagementWSDDServiceName());
                 return _stub;
             }

@@ -66,11 +66,11 @@ import org.apache.axis.client.Stub;
 import org.apache.axis.AxisFault;
 import org.w3c.dom.Element;
 
-import info.fedora.www.definitions._1._0.api.FedoraAPIMServiceLocator;
-import info.fedora.www.definitions._1._0.api.FedoraAPIMService;
-import info.fedora.www.definitions._1._0.api.FedoraAPIM;
+import org.purl.sword.server.fedora.api.FedoraAPIMServiceLocator;
+import org.purl.sword.server.fedora.api.FedoraAPIMService;
+import org.purl.sword.server.fedora.api.FedoraAPIM;
 
-import info.fedora.www.definitions._1._0.types.UserInfo;
+import org.purl.sword.server.fedora.api.UserInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

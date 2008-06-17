@@ -71,9 +71,9 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.client.Stub;
 import org.apache.axis.types.NonNegativeInteger;
 
-import info.fedora.www.definitions._1._0.api.FedoraAPIMServiceLocator;
-import info.fedora.www.definitions._1._0.api.FedoraAPIMService;
-import info.fedora.www.definitions._1._0.api.FedoraAPIM;
+import org.purl.sword.server.fedora.api.FedoraAPIMServiceLocator;
+import org.purl.sword.server.fedora.api.FedoraAPIMService;
+import org.purl.sword.server.fedora.api.FedoraAPIM;
 
 import org.apache.log4j.Logger;
 
