@@ -1,6 +1,7 @@
 <project name="sword" default="jar" basedir=".">
   <!-- set global properties for this build -->
-  <property name="src" location="src"/>
+  <property name="src" location="src/main"/>
+  <property name="src-test" location="src/test"/>
   <property name="lib" location="lib"/>
   <property name="conf" location="conf"/>
   <property name="build" location="build"/>
@@ -12,6 +13,7 @@
 
    <path id="base.path">
       <pathelement location="${build}/classes"/>
+      <pathelement location="${build}/test-classes"/>
       <pathelement location="${tomcat}/common/lib/servlet-api.jar"/>
       <fileset dir="${lib}">
         <include name="**/*.jar"/>
@@ -21,12 +23,14 @@
   <target name="init">
     <tstamp/>
     <mkdir dir="${build}/classes"/>
+    <mkdir dir="${build}/test-classes"/>
   </target>
 
   <target name="compile" depends="init" description="compile the source" >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac compiler="javac1.5" srcdir="${src}" destdir="${build}/classes" classpathref="base.path" nowarn="yes">
+    <javac compiler="javac1.5" srcdir="${src}" destdir="${build}/classes" classpathref="base.path" nowarn="yes" debug="on" debuglevel="lines,vars,source">
 		 <compilerarg value="-Xlint:unchecked"/> 
+		 <compilerarg value="-Xlint:deprecation"/> 
 	 </javac>
   </target>
 
@@ -39,7 +43,6 @@
 		<mkdir dir="${build}/${ant.project.name}/WEB-INF" />	
 		<mkdir dir="${build}/${ant.project.name}/WEB-INF/lib" />	
 		<mkdir dir="${build}/${ant.project.name}/WEB-INF/classes" />	
-
 		
 		<copy todir="${build}/${ant.project.name}/WEB-INF/lib">	
 			<fileset dir="${lib}" includes="**/*.jar" />
@@ -51,11 +54,28 @@
 			<fileset dir="${conf}" includes="*" />
 		</copy>
 
+
+		<mkdir dir="${build}/${ant.project.name}/sub_service_documents" />	
+		<copy todir="${build}/${ant.project.name}/sub_service_documents">	
+			<fileset dir="${conf}/sub_service_documents" includes="*" />
+		</copy>
+
+  		<mkdir dir="${build}/${ant.project.name}/entries" />	
 		<jar jarfile="${build}/${ant.project.name}.war" basedir="${build}/${ant.project.name}"/>
   </target>
 
   <target name="dist" depends="war" description="Copies war to tomcat location">
   		<copy file="${build}/${ant.project.name}.war" todir="${tomcat}/webapps/" />
+  </target>
+
+
+  <target name="test" depends="compile" description="Runs unit test">
+	  <javac compiler="javac1.5" srcdir="${src-test}" destdir="${build}/test-classes" classpathref="base.path" nowarn="yes" debug="on" debuglevel="lines,vars,source">
+		  <compilerarg value="-Xlint:unchecked"/> 
+		  <compilerarg value="-Xlint:deprecation"/> 
+	  </javac> 
+	  <java classname="TestDeposit" classpathref="base.path" />
+	  <java classname="TestServiceDocument" classpathref="base.path" /> 
   </target>
 
   <target name="javadoc" description="Builds api">
