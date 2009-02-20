@@ -66,6 +66,7 @@ public class XMLCollection extends Collection {
 		
 		String tLocation = pCollectionEl.getChild("deposit_url").getText();
 		super.setLocation(tLocation.replaceAll("##COLLECTION_PID##", _collectionPid));
+
 		super.setTitle(pCollectionEl.getChild("title").getText());
 
 		for (Element tAcceptsEl : (List<Element>)pCollectionEl.getChild("accepts").getChildren()) {
@@ -77,10 +78,15 @@ public class XMLCollection extends Collection {
 
 		super.setTreatment(pCollectionEl.getChild("treatment").getText());
 
-		super.setFormatNamespace(pCollectionEl.getAttributeValue("formatNamespace"));
+		for (Element tAcceptsPackageEl : (List<Element>)pCollectionEl.getChild("packaging").getChildren()) {
+			super.addAcceptPackaging(tAcceptsPackageEl.getText(), Float.parseFloat(tAcceptsPackageEl.getAttributeValue("quality")));
+		}
 
 		super.setAbstract(pCollectionEl.getChild("abstract").getText());
 
+		if (pCollectionEl.getChild("service") != null) {
+			super.setService(pCollectionEl.getChild("service").getText());
+		}
 	}
 
 	public String getCollectionPid() {
