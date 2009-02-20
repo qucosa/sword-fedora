@@ -55,21 +55,23 @@ import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.Collection;
 import org.purl.sword.base.SWORDException;
 
-import org.w3.atom.Source;
-import org.w3.atom.Generator;
-import org.w3.atom.Content;
-import org.w3.atom.Link;
-import org.w3.atom.Author;
-import org.w3.atom.Contributor;
-import org.w3.atom.Rights;
-import org.w3.atom.Summary;
-import org.w3.atom.Title;
-import org.w3.atom.InvalidMediaTypeException;
+import org.purl.sword.atom.Source;
+import org.purl.sword.atom.Generator;
+import org.purl.sword.atom.Content;
+import org.purl.sword.atom.Link;
+import org.purl.sword.atom.Author;
+import org.purl.sword.atom.Contributor;
+import org.purl.sword.atom.Rights;
+import org.purl.sword.atom.Summary;
+import org.purl.sword.atom.Title;
+import org.purl.sword.atom.InvalidMediaTypeException;
 
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 import org.purl.sword.server.fedora.baseExtensions.XMLServiceDocument;
 
 import org.purl.sword.server.fedora.utils.XMLProperties;
+
+import org.purl.sword.server.fedora.FedoraServer;
 
 import org.purl.sword.server.fedora.fedoraObjects.FedoraObject;
 import org.purl.sword.server.fedora.fedoraObjects.DublinCore;
@@ -100,30 +102,30 @@ public class DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(DefaultFileHandler.class);
 	/** The mime type of the deposit */
 	protected String _contentType = "";
-	/** The format namespace of the deposit */
-	protected String _formatNamespace = "";
+	/** The packaging of the deposit */
+	protected String _packaging = "";
 	/** Access to the properties file */
 	protected XMLProperties _props = null;
 
 	/**
-	 * Call this from child classes as it initates the Properties file, the content type and format namespace
+	 * Call this from child classes as it initates the Properties file, the content type and packaging
 	 * @param String the mime type of the deposit
-	 * @param String the format namespace
+	 * @param String the packaging 
 	 */ 
-	public DefaultFileHandler(final String pContentType, final String pFormatNamespace) {
+	public DefaultFileHandler(final String pContentType, final String pPackaging) {
 		_props = new XMLProperties();
 		this.setContentType(pContentType);
-		this.setFormatNamespace(pFormatNamespace);
+		this.setPackaging(pPackaging);
 	}
 
 	/**
 	 * This decides whether the File handler can handle the current deposit. Child classes 
 	 * must override this method
 	 * @param String the mime type
-	 * @param String format namespace
+	 * @param String packaging
 	 * @return boolean if this handler can handle the current deposit
 	 */
-	public boolean isHandled(final String pContentType, final String pFormatNamespace) {
+	public boolean isHandled(final String pContentType, final String pPackaging) {
 		return true; // catch all for deposits so can handle anything
 	}
 
@@ -303,14 +305,16 @@ public class DefaultFileHandler implements FileHandler {
 		tEntry.setPublished(this.getCurrDateAsAtom());
 		tEntry.setUpdated(this.getCurrDateAsAtom());
 
-		Source tSource = new Source();
+		//Source tSource = new Source();
 		Generator tGenerator = new Generator();
-		tSource.setGenerator(tGenerator);
-		tGenerator.setUri(_props.getReposiotryUri());
-		tGenerator.setVersion("1.0");
-		tEntry.setSource(tSource);
-
-		tEntry.setVerboseDescription("Your deposit was added to the repository with identifier " + pFedoraObj.getPid() + ". Thank you for depositing.");
+		//tSource.setGenerator(tGenerator);
+		tGenerator.setUri(_props.getRepositoryUri());
+		tGenerator.setVersion(FedoraServer.VERSION);
+		//tEntry.setSource(tSource);
+		tEntry.setGenerator(tGenerator);
+		if (pDeposit.isVerbose()) {
+			tEntry.setVerboseDescription("Your deposit was added to the repository with identifier " + pFedoraObj.getPid() + ". Thank you for depositing.");
+		}	
 
 		return tEntry;
 	}
@@ -325,13 +329,13 @@ public class DefaultFileHandler implements FileHandler {
 	}
 	
 	/** 
-	 * This just sets the no op option and FormatNamespace from the deposit.
+	 * This just sets the no op option and Packaging from the deposit.
 	 * @param SWORDEntry the entry to add the no op value to
 	 * @param DepositCollection the deposit object
 	 */
 	protected void addDepositEntries(final SWORDEntry pEntry, final DepositCollection pDeposit) {
-		if (this.getFormatNamespace() != null && this.getFormatNamespace().trim().length() != 0) {
-			pEntry.setFormatNamespace(this.getFormatNamespace());
+		if (this.getPackaging() != null && this.getPackaging().trim().length() != 0) {
+			pEntry.setPackaging(this.getPackaging());
 		}	
 		pEntry.setNoOp(pDeposit.isNoOp());
 		
@@ -343,7 +347,6 @@ public class DefaultFileHandler implements FileHandler {
 			tContributor.setName(pDeposit.getOnBehalfOf());
 			pEntry.addContributor(tContributor);
 		}
-
 	}
 
 	/**
@@ -366,14 +369,15 @@ public class DefaultFileHandler implements FileHandler {
 
 		pEntry.setId(pFedoraObj.getPid());
 
-		Link tEditMedia = new Link();
-		tEditMedia.setHref(pFedoraObj.getURLToDS(this.getLinkName(pDeposit)));
-		tEditMedia.setHreflang("en");
-		tEditMedia.setRel("edit-media");
-		pEntry.addLink(tEditMedia);
+		// Upload link
+		//Link tEditMedia = new Link();
+		//tEditMedia.setHref(pFedoraObj.getURLToDS(this.getLinkName(pDeposit)));
+		//tEditMedia.setHreflang("en");
+		//tEditMedia.setRel("edit-media");
+		//pEntry.addLink(tEditMedia);
 
 		Link tEdit = new Link();
-		tEdit.setHref(pFedoraObj.getURLToObject());
+		tEdit.setHref(_props.getRepositoryUri() + "/" + pDeposit.getCollectionPid() + "/" + pFedoraObj.getPid());
 		tEdit.setHreflang("en");
 		tEdit.setRel("edit");
 
@@ -494,21 +498,21 @@ public class DefaultFileHandler implements FileHandler {
 	}
 	
 	/**
-	 * Get _formatNamespace.
+	 * Get _packaging.
 	 *
-	 * @return _formatNamespace as String.
+	 * @return _packaging as String.
 	 */
-	public String getFormatNamespace() {
-	    return _formatNamespace;
+	public String getPackaging() {
+	    return _packaging;
 	}
 	
 	/**
-	 * Set _formatNamespace.
+	 * Set _packaging.
 	 *
-	 * @param _formatNamespace the value to set.
+	 * @param _packaging the value to set.
 	 */
-	public void setFormatNamespace(final String pFormatNamespace) {
-	     _formatNamespace = pFormatNamespace;
+	public void setPackaging(final String pPackaging) {
+	     _packaging = pPackaging;
 	}
 
 	/** 
