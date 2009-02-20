@@ -48,6 +48,8 @@ package org.purl.sword.server.fedora.utils;
 
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
+import org.purl.sword.base.Workspace;
+import org.purl.sword.base.Collection;
 
 import org.purl.sword.server.fedora.baseExtensions.XMLServiceDocument;
 
@@ -64,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
 
 public class XMLProperties {
@@ -136,26 +139,26 @@ public class XMLProperties {
 	}
 
 	/**
-	 * This returns the unique URI for a reposiotry
+	 * This returns the unique URI for a repository
 	 *
-	 * @return String the reposiotry URI. 
+	 * @return String the repository URI. 
 	 * @throws SWORDException if there was a problem reading the config file
 	 */
-	public String getReposiotryUri() throws SWORDException {
-		Element tReposiotryUri = null;
+	public String getRepositoryUri() throws SWORDException {
+		Element tRepositoryUri = null;
 		try {
-			tReposiotryUri = (Element)XPath.selectSingleNode(_props, "/properties/general/reposiotry_uri");
-			if (tReposiotryUri == null) {
-				throw new JDOMException("Couldn't find node reposiotry_uri");
+			tRepositoryUri = (Element)XPath.selectSingleNode(_props, "/properties/general/repository_uri");
+			if (tRepositoryUri == null) {
+				throw new JDOMException("Couldn't find node repository_uri");
 			}
 		} catch (JDOMException tJDOMExcpt) {
-			String tMessage = "JDOM Exception occured in getReposiotryUri method due to a problem accessing the properties file";
+			String tMessage = "JDOM Exception occured in getRepositoryUri method due to a problem accessing the properties file";
 			LOG.error(tMessage);
 			LOG.error(tJDOMExcpt.toString());
 			throw new SWORDException(tMessage, tJDOMExcpt);
 		}
 
-		return tReposiotryUri.getText();
+		return tRepositoryUri.getText();
 	}
 
 	/**
@@ -262,7 +265,7 @@ public class XMLProperties {
 
 		String tPort = null;
 		if (tFedoraProps.getChild("port") == null) {
-			LOG.error("Couldn't find port under fedora properties in properties files");
+			LOG.error("Couldn't find port under fedora propertiepOnBehalfOfs in properties files");
 			throw new SWORDException("Invlaid properties file");
 		} else {
 			tPort = tFedoraProps.getChild("port").getText();
@@ -270,6 +273,52 @@ public class XMLProperties {
 
 		return tProtocol + "://" + tHost + ":" + tPort + "/fedora";
 	}	
+
+	/**
+	 * This returns the directory where the entry documents should be stored
+	 *
+	 * @return String the sub service document location. This should be an relative to the web app path
+	 * @throws SWORDException if there was a problem reading the config file
+	 */
+	public String getEntryStoreLocation() throws SWORDException {
+		Element tEntryLoc = null;
+		try {
+			tEntryLoc  = (Element)XPath.selectSingleNode(_props, "/properties/general/entry-location");
+			if (tEntryLoc == null) {
+				throw new JDOMException("Couldn't find node entry-location");
+			}
+		} catch (JDOMException tJDOMExcpt) {
+			String tMessage = "JDOM Exception occured in getEntryLoc method due to a problem accessing the properties file";
+			LOG.error(tMessage);
+			LOG.error(tJDOMExcpt.toString());
+			throw new SWORDException(tMessage, tJDOMExcpt);
+		}
+
+		return StartupServlet.getRealPath(tEntryLoc.getText());
+	}
+	/**
+	 * This returns the directory where the sub service documents are stored relative to the web app directory
+	 *
+	 * @return String the sub service document location. This should be an relative to the web app path
+	 * @throws SWORDException if there was a problem reading the config file
+	 */
+	public String getSubSDDir() throws SWORDException {
+		Element tSubSDDir = null;
+		try {
+			tSubSDDir  = (Element)XPath.selectSingleNode(_props, "/properties/general/sub-service-documents");
+			if (tSubSDDir == null) {
+				throw new JDOMException("Couldn't find node sub-service-documents");
+			}
+		} catch (JDOMException tJDOMExcpt) {
+			String tMessage = "JDOM Exception occured in getSubSDDir method due to a problem accessing the properties file";
+			LOG.error(tMessage);
+			LOG.error(tJDOMExcpt.toString());
+			throw new SWORDException(tMessage, tJDOMExcpt);
+		}
+
+		return tSubSDDir.getText();
+	}
+
 
 	/**
 	 * This is the method which retrieves the Service document from the properties file. 
@@ -290,10 +339,43 @@ public class XMLProperties {
 			throw new SWORDException(tMessage, tJDOMExcpt);
 		}
 
-		return new XMLServiceDocument(tServiceDocumentElement, pOnBehalfOf);
+		XMLServiceDocument tServiceDoc = new XMLServiceDocument(tServiceDocumentElement, pOnBehalfOf);
+		this.addLocationToService(tServiceDoc);
+		return tServiceDoc;
 	}
 
 	
+	public ServiceDocument getServiceDocument(final String pOnBehalfOf, final String pLocation) throws SWORDException {
+		SAXBuilder tBuilder = new SAXBuilder();
+		Document tChildDocs = null; 
+		try {
+			tChildDocs = tBuilder.build(StartupServlet.getRealPath(new File(this.getSubSDDir(), pLocation).getPath()));
+		} catch (IOException tIOExcpt) {
+			String tMessage = "IO Exception occured on doServiceDocument method due to a problem accessing the properties file";
+			LOG.error(tMessage);
+			LOG.error(tIOExcpt.toString());
+			throw new SWORDException(tMessage, tIOExcpt);
+		} catch (JDOMException tJDOMExcpt) {
+			String tMessage = "JDOM Exception occured on doServiceDocument method due to a problem accessing the properties file";
+			LOG.error(tMessage);
+			LOG.error(tJDOMExcpt.toString());
+			throw new SWORDException(tMessage, tJDOMExcpt);
+		}
+
+		XMLServiceDocument tServiceDoc = new XMLServiceDocument(tChildDocs.getRootElement(), pOnBehalfOf);
+		this.addLocationToService(tServiceDoc);
+		return tServiceDoc;
+	}
+
+	private void addLocationToService(final XMLServiceDocument pServiceDoc) throws SWORDException {
+		for (Workspace tWorkspaces: pServiceDoc.getService().getWorkspacesList()) {
+			 for (Collection tCollection: tWorkspaces.getCollections()) {
+				 	if (tCollection.getService() != null && tCollection.getService().trim().length() != 0) {
+						tCollection.setService(this.getRepositoryUri() + "/servicedocument/" + tCollection.getService());
+					}
+			 }
+		}
+	}
 	
 	/**
 	 * ** Use only when you don't have access to the source for XMLProperties **
