@@ -76,14 +76,14 @@ public class ZipFileHandler extends DefaultFileHandler implements FileHandler {
 	}
 	
 	/**
-	 * This file handler accepts files with a mime type application/zip and a format namespace which is null or empty
+	 * This file handler accepts files with a mime type application/zip and a packaging which is null or empty
 	 *
 	 * @param String the mime type
-	 * @param String format namespace
+	 * @param String packaging
 	 * @return boolean if this handler can handle the current deposit
 	 */
-	public boolean isHandled(final String pMimeType, final String pFormatNamespace) {
-		return pMimeType.equals("application/zip") && (pFormatNamespace == null || pFormatNamespace.trim().length() == 0);
+	public boolean isHandled(final String pMimeType, final String pPackaging) {
+		return pMimeType.equals("application/zip") && (pPackaging == null || pPackaging.trim().length() == 0);
 	}
 
 	/**
