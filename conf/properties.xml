@@ -12,10 +12,13 @@
 		<pid_namespace>sword</pid_namespace>
 	</fedora>
 	<general>
-		<!-- Return a URI for the reposiotry (used in atom:generator) -->
-		<reposiotry_uri>http://glen.dnsalias.org/sword</reposiotry_uri>
+		<!-- Return a URI for the repository (used in atom:generator) -->
+		<repository_uri>http://glen.dnsalias.org/sword</repository_uri>
 		<!-- Directory where zip files are extracted and uploads are stored before ingest. This should be an absolute path -->
 		<temp_dir>/usr/local/tomcat/temp/</temp_dir>
+		<!-- This returns the directory where the sub service documents are stored relative to the web app directory -->
+		<sub-service-documents>/sub_service_documents</sub-service-documents>
+		<entry-location>/entries</entry-location>
 	</general>
 	<file_handlers>
 		<!--
@@ -44,12 +47,12 @@
 			<!-- 
 				collection_pid is the pid of the collection where deposits will end up
 			-->
-			<collection collection_pid="collection:open" mediation="true" mediationSet="true" formatNamespace="uri">
+			<collection collection_pid="collection:open" mediation="true" mediationSet="true">
 				<!-- 
 					This is the URL which listens for deposit requests
 					##COLLECTION_PID## is overwritten at runtime to contain the value of collection_pid
 				-->
-				<deposit_url>http://glen.dnsalias.org/sword/deposit/##COLLECTION_PID##</deposit_url>
+				<deposit_url>http://glen.dnsalias.org/sword/##COLLECTION_PID##</deposit_url>
 				<users/>
 				<title>Open Collection</title>
 				<abstract>This is a collection of objects which can be freely deposited to. This is aviable for the SWORD test project</abstract>
@@ -64,9 +67,30 @@
 					<accept>image/jpeg</accept> 
 					<accept>image/jpg</accept> 
 				</accepts>
+				<packaging>
+					<package quality="0.9">http://purl.org/net/sword-types/METSDSpaceSIP</package>
+				</packaging>
 			</collection>
-			<collection collection_pid="collection:closed" mediation="true" mediationSet="true" formatNamespace="uri">
-				<deposit_url>http://glen.dnsalias.org/sword/deposit/##COLLECTION_PID##</deposit_url>
+			<collection collection_pid="collection:nested" mediation="true" mediationSet="true">
+				<deposit_url>http://glen.dnsalias.org/sword/geography-collection</deposit_url>
+				<!-- 
+					The service defenition for this collection is else where
+				-->
+				<users />
+				<title>Geography Collection</title>
+				<abstract>This is a nested collection of geography objects</abstract>
+				<policy>This collection accepts any deposit </policy>
+				<treatment>Preservation actions may occur on submited deposits</treatment>
+				<accepts>
+					<accept>application/zip</accept>
+				</accepts>
+				<packaging>
+					<package quality="0.9">http://purl.org/net/sword-types/METSDSpaceSIP</package>
+				</packaging>
+				<service>geography.xml</service>
+			</collection>
+			<collection collection_pid="collection:closed" mediation="true" mediationSet="true">
+				<deposit_url>http://glen.dnsalias.org/sword/##COLLECTION_PID##</deposit_url>
 				<!-- 
 					This collection only allows deposits from gmr you can deposit as gmr
 					either by setting the on Behalf of parameter as gmr or by using the username gmr. Users are added using
@@ -88,6 +112,9 @@
 					<accept>image/jpg</accept> 
 					<accept>application/x-zip-compressed</accept> 
 				</accepts>
+				<packaging>
+					<package quality="0.9">http://purl.org/net/sword-types/METSDSpaceSIP</package>
+				</packaging>
 			</collection>
 		</workspace>
 	</service_document>
