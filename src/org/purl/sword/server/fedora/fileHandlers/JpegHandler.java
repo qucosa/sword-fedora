@@ -63,15 +63,15 @@ public class JpegHandler extends DefaultFileHandler implements FileHandler {
 	}
 	
 	/**
-	 * This file handler can handle mime type of image/jpeg and a format namespace 
+	 * This file handler can handle mime type of image/jpeg and packaging 
 	 * which is either null or empty
 	 *
 	 * @param String the mime type
-	 * @param String format namespace
+	 * @param String packaging
 	 * @return boolean if this handler can handle the current deposit
 	 */
-	public boolean isHandled(final String pMimeType, final String pFormatNamespace) {
-		return pMimeType.equals("image/jpeg") && (pFormatNamespace == null || pFormatNamespace.trim().length() == 0);
+	public boolean isHandled(final String pMimeType, final String pPackaging) {
+		return pMimeType.equals("image/jpeg") && (pPackaging == null || pPackaging.trim().length() == 0);
 	}
 
 	/** 
