@@ -53,4 +53,5 @@ public interface ServiceDocumentQueries {
 	public Element getCollectionElement(final String pCollectionPID) throws SWORDException;
 	public boolean isAllowedToDeposit(final String pDepositer, final String pCollectionPID) throws SWORDException;
 	public boolean isContentTypeAllowed(final String pContentType, final String pCollectionPID) throws SWORDException;
+	public boolean isPackageTypeAllowed(final String pPackageType, final String pCollectionPID) throws SWORDException;
 }
