@@ -64,7 +64,7 @@ public class DepositCollection extends Deposit {
 		super.setMd5(pOriginalDeposit.getMd5());
 		super.setVerbose(pOriginalDeposit.isVerbose());
 		super.setNoOp(pOriginalDeposit.isNoOp());
-		super.setFormatNamespace(pOriginalDeposit.getFormatNamespace());
+		super.setPackaging(pOriginalDeposit.getPackaging());
 		super.setDepositID(pOriginalDeposit.getDepositID());
 		super.setIPAddress(pOriginalDeposit.getIPAddress());
 		super.setLocation(pOriginalDeposit.getLocation());
