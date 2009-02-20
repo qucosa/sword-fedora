@@ -34,7 +34,6 @@
     <servlet-class>org.purl.sword.server.DepositServlet</servlet-class>
   </servlet>
 
-
   <servlet>
     <servlet-name>StartupServlet</servlet-name>
     <servlet-class>org.purl.sword.server.fedora.utils.StartupServlet</servlet-class>
@@ -53,11 +52,11 @@
 
   <servlet-mapping>
     <servlet-name>servicedocument</servlet-name>
-    <url-pattern>/app/servicedocument</url-pattern>
+    <url-pattern>/servicedocument/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>deposit</servlet-name>
-    <url-pattern>/app/deposit/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
 </web-app>
