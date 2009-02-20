@@ -74,6 +74,10 @@ import org.apache.axis.types.NonNegativeInteger;
 import org.purl.sword.server.fedora.api.FedoraAPIMServiceLocator;
 import org.purl.sword.server.fedora.api.FedoraAPIMService;
 import org.purl.sword.server.fedora.api.FedoraAPIM;
+import org.purl.sword.server.fedora.api.FedoraAPIAServiceLocator;
+import org.purl.sword.server.fedora.api.FedoraAPIAService;
+import org.purl.sword.server.fedora.api.FedoraAPIA;
+import org.purl.sword.server.fedora.api.RepositoryInfo;
 
 import org.apache.log4j.Logger;
 
@@ -89,8 +93,9 @@ public class FedoraObject {
 
 	protected FedoraAPIM _APIM = null;
 	protected XMLProperties _props = null;
-	protected String _username;
-	protected String _password;
+	protected String _username = null;
+	protected String _password = null;
+	protected String _fedoraVersion = null;
 
 	/**
 	 * Contacts the Fedora repository to retrieve the next avilable PID
@@ -108,12 +113,25 @@ public class FedoraObject {
 			FedoraAPIMService tService = new FedoraAPIMServiceLocator();
 			((FedoraAPIMServiceLocator)tService).setmanagementEndpointAddress(_props.getFedoraURL() + "/services/management");
 			_APIM = tService.getmanagement();
+
+			FedoraAPIAService tServiceAPIA = new FedoraAPIAServiceLocator();
+			((FedoraAPIAServiceLocator)tServiceAPIA).setaccessEndpointAddress(_props.getFedoraURL() + "/services/access");
+			FedoraAPIA tAPIA = tServiceAPIA.getaccess();
+			((Stub)tAPIA).setUsername(pUsername);
+			((Stub)tAPIA).setPassword(pPassword);
+			RepositoryInfo tInfo = tAPIA.describeRepository();
+			_fedoraVersion = tInfo.getRepositoryVersion().trim();
+			LOG.debug("Storing fedora version " + _fedoraVersion);
 		} catch (ServiceException tServiceExcpt) {
 			LOG.error("Can't connect to Fedora");
 			LOG.error(tServiceExcpt.toString());
 		} catch (SWORDException tSwordExcpt) {
 			LOG.error("Invalid fedora section of configuraiton file");
 			LOG.error(tSwordExcpt.toString());
+		} catch (RemoteException tRemoteExcpt) {
+			LOG.error("Can't connect to Fedora to find the Version");
+			LOG.error(tRemoteExcpt.toString());
+			throw new SWORDException("Can't connect to Fedora to find the Version: " + tRemoteExcpt.toString());
 		}
 
 		// find next pid 
@@ -188,6 +206,24 @@ public class FedoraObject {
 		_disseminators = pDisseminators;
 	}
 
+	/**
+	 * Get fedoraVersion.
+	 *
+	 * @return fedoraVersion as String.
+	 */
+	public String getFedoraVersion() {
+	    return _fedoraVersion;
+	}
+	
+	/**
+	 * Set fedoraVersion.
+	 *
+	 * @param fedoraVersion the value to set.
+	 */
+	public void setFedoraVersion(final String pFedoraVersion) {
+	     _fedoraVersion = pFedoraVersion;
+	}
+
 	protected void uploadLocalDatastreams() throws SWORDException {
 		try {
 			Iterator<Datastream> tDatastreamsIter = this.getDatastreams().iterator();
@@ -226,11 +262,18 @@ public class FedoraObject {
 		Document tFOXML = this.toFOXML();
 		try {
 			tOut.output(tFOXML, tByteArray);
+			tOut.output(tFOXML, new java.io.FileOutputStream("/tmp/test.xml"));
 
 			((Stub)_APIM).setUsername(_username);
 			((Stub)_APIM).setPassword(_password);
+			String tXMLFormat = "";
+			if (_fedoraVersion.startsWith("3")) { 
+				tXMLFormat = "info:fedora/fedora-system:FOXML-1.1";
+			} else {
+				tXMLFormat = "foxml1.0";
+			}
 
-			_APIM.ingest(tByteArray.toByteArray(), "foxml1.0", "ingested by the sword program");
+			_APIM.ingest(tByteArray.toByteArray(), tXMLFormat, "ingested by the sword program");
 		} catch (RemoteException tRemoteExcpt) {
 			try {
 				tOut.output(tFOXML, System.out);
@@ -278,6 +321,9 @@ public class FedoraObject {
 		Element tDigitalObject = new Element("digitalObject", FOXML);
 		tFOXML.setRootElement(tDigitalObject);
 		tDigitalObject.setAttribute("PID", this.getPid());
+		if (_fedoraVersion.startsWith("3")) {
+			tDigitalObject.setAttribute("VERSION", "1.1");
+		}
 
 		tDigitalObject.addContent(this.getObjectPropsXML());
 		tDigitalObject.addContent(this.addDSXML());
@@ -290,7 +336,10 @@ public class FedoraObject {
 		Element tObjectPropsEl = new Element("objectProperties", FOXML);
 
 		for (Property tProp : this.getIdentifiers()) {
-			tObjectPropsEl.addContent(tProp.toFOXML(FOXML));
+			if (!(_fedoraVersion.startsWith("3") && tProp.getName().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))) {
+				LOG.debug("Adding " + tProp.getName());
+				tObjectPropsEl.addContent(tProp.toFOXML(FOXML));
+			}	
 		}
 
 		return tObjectPropsEl;
@@ -318,4 +367,6 @@ public class FedoraObject {
 		
 		return tDisseminatorsList;
 	}
+	
+
 }
