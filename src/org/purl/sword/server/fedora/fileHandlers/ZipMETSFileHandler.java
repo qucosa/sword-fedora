@@ -85,14 +85,14 @@ public class ZipMETSFileHandler extends DefaultFileHandler implements FileHandle
 	}
 	
 	/**
-	 * This file handler accepts a deposit with a mime type of application/zip and a format namespace of mets
+	 * This file handler accepts a deposit with a mime type of application/zip and a packaging defined by the sword-types for METS
 	 *
 	 * @param String the mime type
-	 * @param String format namespace
+	 * @param String packaging
 	 * @return boolean if this handler can handle the current deposit
 	 */
-	public boolean isHandled(final String pMimeType, final String pFormatNamespace) {
-		return pMimeType.equals("application/zip") && pFormatNamespace != null && pFormatNamespace.equalsIgnoreCase("mets");
+	public boolean isHandled(final String pMimeType, final String pPackaging) {
+		return pMimeType.equals("application/zip") && pPackaging != null && pPackaging.equalsIgnoreCase("http://www.loc.gov/METS/");
 	}
 
 	/**

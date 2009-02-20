@@ -74,14 +74,14 @@ public class METSFileHandler extends DefaultFileHandler implements FileHandler {
 	}
 	
 	/**
-	 * This file handler can handle mime types text/xml with a format namesapce of mets
+	 * This file handler can handle mime types text/xml with packaging of mets defined by the sword-types specification
 	 *
 	 * @param String the mime type
-	 * @param String format namespace
+	 * @param String packaging (should be http://www.loc.gov/METS/)
 	 * @return boolean if this handler can handle the current deposit
 	 */
-	public boolean isHandled(final String pMimeType, final String pFormatNamespace) {
-		return pMimeType.equals("text/xml") && pFormatNamespace != null && pFormatNamespace.equalsIgnoreCase("mets");
+	public boolean isHandled(final String pMimeType, final String pPackaging) {
+		return pMimeType.equals("text/xml") && pPackaging != null && pPackaging.equalsIgnoreCase("http://www.loc.gov/METS/");
 	}
 
 	/**
