@@ -57,22 +57,22 @@ import java.util.ArrayList;
 public class FileHandlerFactory {
 	private static final Logger LOG = Logger.getLogger(FileHandlerFactory.class);
 	/**
-	 * Find the file handler which can handle the mime type and format namespace
+	 * Find the file handler which can handle the mime type and packaging
 	 *
 	 * @param String the mime type of the deposit
-	 * @param String the format namespace
+	 * @param String the packaging
 	 * @return FileHandler the file handler which can handle the deposit
 	 * @throws SWORDException if there was a problem reading the config file or a file handler couldn't be created
 	 */
-	public static FileHandler getFileHandler(final String pContentType, final String pFormatNamespace) throws SWORDException {
-		LOG.debug("Looking for " + pContentType + " and format " + pFormatNamespace);
+	public static FileHandler getFileHandler(final String pContentType, final String pPackaging) throws SWORDException {
+		LOG.debug("Looking for " + pContentType + " and packaging " + pPackaging);
 
 		Iterator<FileHandler> tHandlerIter = FileHandlerFactory.getFileHandlers().iterator();
 		FileHandler tHandler = null;
 		while (tHandlerIter.hasNext()) {
 			tHandler = tHandlerIter.next();
 
-			if (tHandler.isHandled(pContentType, pFormatNamespace)) {
+			if (tHandler.isHandled(pContentType, pPackaging)) {
 				LOG.debug("Found handler " + tHandler.getClass().getName());
 				return tHandler;
 			}
@@ -80,7 +80,7 @@ public class FileHandlerFactory {
 
 		// Nothing found so return default handler
 		LOG.debug("Couldn't find a file handler so using default");
-		return new DefaultFileHandler(pContentType, pFormatNamespace);
+		return new DefaultFileHandler(pContentType, pPackaging);
 	}
 
 	private static List<FileHandler> getFileHandlers() throws SWORDException {
