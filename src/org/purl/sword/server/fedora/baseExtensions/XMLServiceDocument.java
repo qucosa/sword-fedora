@@ -46,10 +46,11 @@ package org.purl.sword.server.fedora.baseExtensions;
 
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.SWORDException;
-import org.purl.sword.base.ServiceLevel;
 import org.purl.sword.base.Service;
 import org.purl.sword.base.Workspace;
 import org.purl.sword.base.Collection;
+
+import org.purl.sword.server.fedora.FedoraServer;
 
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -71,15 +72,7 @@ public class XMLServiceDocument extends ServiceDocument implements ServiceDocume
 
 		_serviceDocEl = pServiceDocEl;
 
-		ServiceLevel tLevel = null;
-		if (pServiceDocEl.getChild("level").getText().equals("1")) {
-			tLevel = ServiceLevel.ONE;
-		} else if (pServiceDocEl.getChild("level").getText().equals("0")) {
-			tLevel = ServiceLevel.ZERO;
-		} else {
-			tLevel = ServiceLevel.UNDEFINED;
-		}
-		Service tService = new Service(tLevel);
+		Service tService = new Service(FedoraServer.VERSION);
 
 		tService.setNoOp(this.convertToBoolean(pServiceDocEl.getChild("noOp").getText()));
 		tService.setVerbose(this.convertToBoolean(pServiceDocEl.getChild("verbose").getText()));
@@ -216,6 +209,34 @@ public class XMLServiceDocument extends ServiceDocument implements ServiceDocume
 			}
 		} catch (JDOMException tJDOMExcpt) {
 			String tErrMessage = "Problem reading properties XML tried to find content type " + pContentType + " for collection " + pCollectionPID + ": ";
+			LOG.error(tErrMessage + tJDOMExcpt.toString());
+			throw new SWORDException(tErrMessage, tJDOMExcpt); 
+		}
+	}
+
+	public boolean isPackageTypeAllowed(final String pPackageType, final String pCollectionPID) throws SWORDException {
+		if (pPackageType == null || pPackageType.trim().length() == 0) {
+			return true; // haven't specified a package type
+		}
+		// Check to see if content type is in the allowed list
+		try {
+			Element tAcceptEl = (Element)XPath.selectSingleNode(_serviceDocEl, "./workspace/collection[@collection_pid='" + pCollectionPID + "']/packaging/package[. = '" + pPackageType + "']");
+			if (tAcceptEl == null) {
+				return false;
+			} else {
+				if (tAcceptEl.getAttributeValue("q") != null) {
+						float tQ = Float.parseFloat(tAcceptEl.getAttributeValue("q"));
+						if (tQ > 0.0) {
+							return true;
+						} else {
+							return false;
+						}
+				} else {	
+					return true;
+				}
+			}
+		} catch (JDOMException tJDOMExcpt) {
+			String tErrMessage = "Problem reading properties XML tried to find content type " + pPackageType + " for collection " + pCollectionPID + ": ";
 			LOG.error(tErrMessage + tJDOMExcpt.toString());
 			throw new SWORDException(tErrMessage, tJDOMExcpt); 
 		}
