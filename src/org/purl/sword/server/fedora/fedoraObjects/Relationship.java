@@ -58,6 +58,7 @@ public class Relationship extends InlineDatastream	{
 
 	public final Namespace RDF = Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 	public final Namespace REL = Namespace.getNamespace("rel", "info:fedora/fedora-system:def/relations-external#");
+	public final Namespace MODEL = Namespace.getNamespace("fedora-model", "info:fedora/fedora-system:def/model#");
 
 	public Relationship() {
 		super("RELS-EXT");
@@ -77,6 +78,20 @@ public class Relationship extends InlineDatastream	{
 			tRelationEl = (Element)tRelationshipsIter.next();
 
 			this.add(tRelationEl.getNamespace(), tRelationEl.getName(), tRelationEl.getAttributeValue("resource", RDF));
+		}
+	}
+
+	public void addDefaultModel() {
+		boolean tFound = false;
+		for (Element tEl : _relationship) {
+			if (tEl.getName().equals("hasModel") && tEl.getAttributeValue("resource", RDF).equals("info:fedora/fedora-system:FedoraObject-3.0")) {
+				tFound = true;
+			}
+		}
+		if (!tFound) {
+			Element tDefaultModel = new Element("hasModel", MODEL);
+			tDefaultModel.setAttribute("resource", "info:fedora/fedora-system:FedoraObject-3.0", RDF);
+			_relationship.add(tDefaultModel);
 		}
 	}
 
@@ -131,7 +146,7 @@ public class Relationship extends InlineDatastream	{
 	 */
 	public Document toXML() {
 		Document tRDF = new Document();
-		Element tRoot = new Element("rdf", RDF);
+		Element tRoot = new Element("RDF", RDF);
 		tRDF.setRootElement(tRoot);
 
 		Element tDescription = new Element("Description", RDF);
