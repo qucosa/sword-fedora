@@ -47,10 +47,14 @@ import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
 import org.purl.sword.base.SWORDAuthenticationException;
 import org.purl.sword.base.SWORDException;
+import org.purl.sword.base.SWORDErrorException;
+import org.purl.sword.base.ErrorCodes;
 import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.ServiceDocumentRequest;
-import org.purl.sword.base.SWORDContentTypeException;
+import org.purl.sword.base.UnmarshallException;
+
+import org.purl.sword.atom.Link;
 
 import org.purl.sword.server.fedora.utils.XMLProperties;
 import org.purl.sword.server.fedora.baseExtensions.ServiceDocumentQueries;
@@ -64,29 +68,53 @@ import java.rmi.RemoteException;
 
 import org.apache.axis.client.Stub;
 import org.apache.axis.AxisFault;
+
 import org.w3c.dom.Element;
+
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.ParsingException;
+import nu.xom.Serializer;
 
 import org.purl.sword.server.fedora.api.FedoraAPIMServiceLocator;
 import org.purl.sword.server.fedora.api.FedoraAPIMService;
 import org.purl.sword.server.fedora.api.FedoraAPIM;
+import org.purl.sword.server.fedora.api.FedoraAPIAServiceLocator;
+import org.purl.sword.server.fedora.api.FedoraAPIAService;
+import org.purl.sword.server.fedora.api.FedoraAPIA;
+import org.purl.sword.server.fedora.api.RepositoryInfo;
 
 import org.purl.sword.server.fedora.api.UserInfo;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.File;
+
+import java.util.Iterator;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class FedoraServer implements SWORDServer {
+	public static final String VERSION = "1.3";
 	private static final Logger LOG = Logger.getLogger(FedoraServer.class);
 
 	protected FedoraAPIM _APIM = null;
+	protected FedoraAPIA _APIA = null;
 	protected XMLProperties _props = null;
 	public FedoraServer() {
+
 		_props = new XMLProperties();
 	
 		try {
 			FedoraAPIMService tService = new FedoraAPIMServiceLocator();
 			((FedoraAPIMServiceLocator)tService).setmanagementEndpointAddress(_props.getFedoraURL() + "/services/management");
 			_APIM = tService.getmanagement();
+
+			FedoraAPIAService tServiceAPIA = new FedoraAPIAServiceLocator();
+			((FedoraAPIAServiceLocator)tServiceAPIA).setaccessEndpointAddress(_props.getFedoraURL() + "/services/access");
+			_APIA = tServiceAPIA.getaccess();
 		} catch (ServiceException tServiceExcpt) {
 			LOG.error("Can't connect to Fedora");
 			LOG.error(tServiceExcpt.toString());
@@ -108,6 +136,10 @@ public class FedoraServer implements SWORDServer {
 		return _props.getServiceDocument(pOnBehalfOf);
 	}
 
+	protected ServiceDocument getServiceDocument(final String pOnBehalfOf, final String pLocation) throws SWORDException {
+		return _props.getServiceDocument(pOnBehalfOf, pLocation);
+	}
+
 	/**
 	 * Answer a Service Document request sent on behalf of a user
 	 * 
@@ -120,6 +152,7 @@ public class FedoraServer implements SWORDServer {
 	 * @return The ServiceDocument representing the service document
 	 */
 	public ServiceDocument doServiceDocument(ServiceDocumentRequest pServiceRequest) throws SWORDAuthenticationException, SWORDException {
+		LOG.debug(org.purl.sword.base.Namespaces.NS_APP);
 		if (pServiceRequest.getUsername() != null) {
 			this.authenticates(pServiceRequest.getUsername(), pServiceRequest.getPassword());
 		}
@@ -128,8 +161,15 @@ public class FedoraServer implements SWORDServer {
 		if (tOnBehalfOf == null) { // On Behalf off not supplied so send the username instead
 		 	tOnBehalfOf = pServiceRequest.getUsername();
 		}
+
+		String[] tURIList = pServiceRequest.getLocation().split("/");
+		String tLocation = tURIList[tURIList.length -1];
 		
-		return this.getServiceDocument(tOnBehalfOf);
+		if (tLocation.equals("servicedocument")) {
+			return this.getServiceDocument(tOnBehalfOf);
+		} else { // sub service document
+			return this.getServiceDocument(tOnBehalfOf, tLocation);
+		}	
 	}
 	
 	/**
@@ -143,7 +183,7 @@ public class FedoraServer implements SWORDServer {
 	 * 
 	 * @return The response to the deposit
 	 */
-	public DepositResponse doDeposit(Deposit pDeposit) throws SWORDAuthenticationException, SWORDException, SWORDContentTypeException {
+	public DepositResponse doDeposit(Deposit pDeposit) throws SWORDAuthenticationException, SWORDException, SWORDErrorException {
 		try {
 			if (pDeposit.isVerbose()) {
 				LOG.setLevel(Level.DEBUG);
@@ -176,19 +216,47 @@ public class FedoraServer implements SWORDServer {
 
 			// Check to see if content type is in the allowed list
 			if (!tServiceDoc.isContentTypeAllowed(pDeposit.getContentType(), tCollectionPID)) {
-				LOG.debug("Type " + pDeposit.getContentType() + " is not accepted in collection " + tCollectionPID);
-				throw new SWORDContentTypeException(); 
+				String tDesc = "Type " + pDeposit.getContentType() + " is not accepted in collection " + tCollectionPID; 
+				LOG.debug(tDesc);
+				throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, tDesc); 
+			}
+
+			// Check to see if package type is in the allowed list
+			if (!tServiceDoc.isPackageTypeAllowed(pDeposit.getPackaging(), tCollectionPID)) {
+				String tDesc = "Packaging Type " + pDeposit.getPackaging() + " is not accepted in collection " + tCollectionPID; 
+				LOG.debug(tDesc);
+				throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, tDesc); 
 			}
 
 			// Call the file handlers and see which one responds that it can handle the deposit
-			FileHandler tHandler = FileHandlerFactory.getFileHandler(pDeposit.getContentType(), pDeposit.getFormatNamespace());
+			FileHandler tHandler = FileHandlerFactory.getFileHandler(pDeposit.getContentType(), pDeposit.getPackaging());
 			SWORDEntry tEntry = tHandler.ingestDepost(new DepositCollection(pDeposit, tCollectionPID), (ServiceDocument)tServiceDoc);
 		
 			// send response
 			DepositResponse tResponse = new DepositResponse(Deposit.CREATED);
 			tResponse.setEntry(tEntry);
+			Link tLink = null;
+			Iterator<Link> tLinksIter = tEntry.getLinks();
+			while (tLinksIter.hasNext()) {
+				tLink = tLinksIter.next();
+				if (tLink.getRel().equals("edit")) {
+					break;
+				}
+			}
+			tResponse.setLocation(tLink.getHref());
+			// and save response for further gets
+			FileOutputStream tStream = new FileOutputStream(new File(_props.getEntryStoreLocation(), tEntry.getId().replaceAll(":", "_") + ".xml"));
+         Serializer tSerializer = new Serializer(tStream, "UTF-8");
+         tSerializer.setIndent(3);
+
+			Document tDoc = new Document(tEntry.marshall());
+			tSerializer.write(tDoc);  
+
 			return tResponse;
-	
+		} catch (IOException tIOExcpt) {
+			tIOExcpt.printStackTrace();
+			LOG.error("Exception occured: " + tIOExcpt);
+			throw new SWORDException(tIOExcpt.getMessage());
 		} catch (SWORDException tException) {
 			tException.printStackTrace();
 			LOG.error("Exception occured: " + tException);
@@ -203,6 +271,41 @@ public class FedoraServer implements SWORDServer {
 			throw tRuntimeExcpt;
 		}
 	}
+
+/*
+	public DepositResponse getDeposit(final String pCollection, final String pID) throws SWORDAuthenticationException, SWORDException, SWORDErrorException {
+		try {
+			// send response
+			DepositResponse tResponse = new DepositResponse(Deposit.CREATED);
+
+			LOG.debug("Collection is " + pCollection + " id is " + pID);
+			Builder tBuilder = new Builder();
+			File tFile = new File(new File(_props.getEntryStoreLocation(), pCollection), pID.replaceAll(":", "_") + ".xml");
+			if (tFile.exists()) {
+				Document tDoc = tBuilder.build();
+				SWORDEntry tEntry = new SWORDEntry();
+				tEntry.unmarshall(tDoc.getRootElement());
+				tResponse.setEntry(tEntry);
+				tisFile = true;
+			}	
+			if (!tisFile) { // check if its a directory
+			}
+
+			return tResponse;
+		} catch (IOException tIOExcpt) {
+			tIOExcpt.printStackTrace();
+			LOG.error("Exception occured: " + tIOExcpt);
+			throw new SWORDException(tIOExcpt.getMessage());
+		} catch (UnmarshallException tUnmarshalExcpt) {
+			tUnmarshalExcpt.printStackTrace();
+			LOG.error("Exception occured: " + tUnmarshalExcpt);
+			throw new SWORDException(tUnmarshalExcpt.getMessage());
+		} catch (ParsingException tParseExcpt) {
+			tParseExcpt.printStackTrace();
+			LOG.error("Exception occured: " + tParseExcpt);
+			throw new SWORDException(tParseExcpt.getMessage());
+		}
+	}*/
 	
 	/**
 	 * Authenticate a user
@@ -215,13 +318,14 @@ public class FedoraServer implements SWORDServer {
 	public void authenticates(final String pUsername, final String pPassword) throws SWORDAuthenticationException, SWORDException {
 		// Now use the service to get a stub which implements the SDI.
 		try {
-			((Stub)_APIM).setUsername(pUsername);
-			((Stub)_APIM).setPassword(pPassword);
+			((Stub)_APIA).setUsername(pUsername);
+			((Stub)_APIA).setPassword(pPassword);
 
 		// Make the actual call
-			UserInfo tUserInfo = _APIM.describeUser(pUsername);
-			LOG.debug("UserID=" + tUserInfo.getId());
-			LOG.debug("IsAdministrator=" + tUserInfo.isAdministrator());
+			//UserInfo tUserInfo = _APIM.describeUser(pUsername);
+			RepositoryInfo tInfo = _APIA.describeRepository();
+			LOG.debug("Name =" + tInfo.getRepositoryName());
+			LOG.debug("Repository Version =" + tInfo.getRepositoryVersion());
 			// if we get here then we have authenticated ok
 			return;
 		} catch (AxisFault tFault) {
