@@ -45,6 +45,8 @@ package org.purl.sword.server.fedora;
 import org.purl.sword.server.SWORDServer;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
+import org.purl.sword.base.AtomDocumentRequest;
+import org.purl.sword.base.AtomDocumentResponse;
 import org.purl.sword.base.SWORDAuthenticationException;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.SWORDErrorException;
@@ -271,6 +273,24 @@ public class FedoraServer implements SWORDServer {
 			throw tRuntimeExcpt;
 		}
 	}
+
+	/**
+	 * Answer a request for an entry document
+	 * 
+	 * @param adr The Atom Document Request object
+	 * 
+	 * @exception SWORDAuthenticationException Thrown if the authentication fails
+	 * @exception SWORDErrorException Thrown if there was an error with the input not matching
+	 *            the capabilities of the server
+	 * @exception SWORDException Thrown if an un-handalable Exception occurs. 
+	 *            This will be dealt with by sending a HTTP 500 Server Exception
+	 * 
+	 * @return The response to the atom document request
+	 */
+	public AtomDocumentResponse doAtomDocument(AtomDocumentRequest adr) throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
+		return null;
+	}
+
 
 /*
 	public DepositResponse getDeposit(final String pCollection, final String pID) throws SWORDAuthenticationException, SWORDException, SWORDErrorException {
