@@ -70,7 +70,7 @@ public class METSFileHandler extends DefaultFileHandler implements FileHandler {
 	protected METSObject _mets = null;
 	
 	public METSFileHandler() {
-		super("text/xml", "mets");
+		super("text/xml", "http://www.loc.gov/METS/");
 	}
 	
 	/**
