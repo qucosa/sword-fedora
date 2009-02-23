@@ -69,6 +69,7 @@
 				</accepts>
 				<packaging>
 					<package quality="0.9">http://purl.org/net/sword-types/METSDSpaceSIP</package>
+					<package quality="0.9">http://www.loc.gov/METS/</package>
 				</packaging>
 			</collection>
 			<collection collection_pid="collection:nested" mediation="true" mediationSet="true">
