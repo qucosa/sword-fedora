@@ -80,7 +80,7 @@ public class ZipMETSFileHandler extends DefaultFileHandler implements FileHandle
 	protected List<Datastream> _datastreamList = null;
 
 	public ZipMETSFileHandler() {
-		super("application/zip", "mets");
+		super("application/zip", "http://www.loc.gov/METS/");
 		_datastreamList = new ArrayList<Datastream>();
 	}
 	
