@@ -6,15 +6,15 @@ In the client set the following:
 
 File: location of the gif file
 File Type: image/gif
-Format Namespace: 
+Packaging: 
 
-(Format Namespace should be left empty)
+(Packaging should be left empty)
 
 
 Results:
 
 This will create an object with one datastream containing the image, one basic dc record and a relationships record
 
-RELS-EXT  	Relationships to other objects  	text/xml
-DC 		Dublin Core Metadata 			text/xml
-uploaded 	SWORD Generic File Upload 		image/gif
+RELS-EXT       Relationships to other objects      text/xml
+DC             Dublin Core Metadata                text/xml
+uploaded       SWORD Generic File Upload           image/gif
