@@ -327,7 +327,10 @@ public class FedoraObject {
 
 		tDigitalObject.addContent(this.getObjectPropsXML());
 		tDigitalObject.addContent(this.addDSXML());
-		tDigitalObject.addContent(this.addDisseminatorsXML());
+		if (!_fedoraVersion.startsWith("3")) {
+			// Don't add disseminators to Fedora 3 as they are handled by content models
+			tDigitalObject.addContent(this.addDisseminatorsXML());
+		}
 
 		return tFOXML;
 	}

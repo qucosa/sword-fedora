@@ -94,6 +94,19 @@ public class Relationship extends InlineDatastream	{
 			_relationship.add(tDefaultModel);
 		}
 	}
+	public void addModel(final String pModel) {
+		boolean tFound = false;
+		for (Element tEl : _relationship) {
+			if (tEl.getName().equals("hasModel") && tEl.getAttributeValue("resource", RDF).equals(pModel)) {
+				tFound = true;
+			}
+		}
+		if (!tFound) {
+			Element tModel = new Element("hasModel", MODEL);
+			tModel.setAttribute("resource", pModel, RDF);
+			_relationship.add(tModel);
+		}
+	}
 
 	public String getPid() {
 		return _pid;
