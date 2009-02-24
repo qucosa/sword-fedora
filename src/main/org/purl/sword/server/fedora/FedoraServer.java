@@ -73,6 +73,8 @@ import org.apache.axis.AxisFault;
 
 import org.w3c.dom.Element;
 
+import javax.servlet.http.HttpServletResponse;
+
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
@@ -85,8 +87,6 @@ import org.purl.sword.server.fedora.api.FedoraAPIAServiceLocator;
 import org.purl.sword.server.fedora.api.FedoraAPIAService;
 import org.purl.sword.server.fedora.api.FedoraAPIA;
 import org.purl.sword.server.fedora.api.RepositoryInfo;
-
-import org.purl.sword.server.fedora.api.UserInfo;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -213,7 +213,7 @@ public class FedoraServer implements SWORDServer {
 			if (!tServiceDoc.isAllowedToDeposit(tOnBehalfOf, tCollectionPID)) {
 				String tMessage = "User: " + tOnBehalfOf + " is not allowed to deposit in collection " + tCollectionPID;
 				LOG.debug(tMessage);
-				throw new SWORDAuthenticationException(tMessage, null);
+				throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN, tMessage);
 			}
 
 			// Check to see if content type is in the allowed list
@@ -247,7 +247,11 @@ public class FedoraServer implements SWORDServer {
 			}
 			tResponse.setLocation(tLink.getHref());
 			// and save response for further gets
-			FileOutputStream tStream = new FileOutputStream(new File(_props.getEntryStoreLocation(), tEntry.getId().replaceAll(":", "_") + ".xml"));
+			File tCollectionDir = new File(_props.getEntryStoreLocation(), tCollectionPID.replaceAll(":", "_"));
+			if (!tCollectionDir.exists()) {
+				tCollectionDir.mkdir();
+			}
+			FileOutputStream tStream = new FileOutputStream(new File(tCollectionDir, tEntry.getId().replaceAll(":", "_") + ".xml"));
          Serializer tSerializer = new Serializer(tStream, "UTF-8");
          tSerializer.setIndent(3);
 
@@ -287,29 +291,38 @@ public class FedoraServer implements SWORDServer {
 	 * 
 	 * @return The response to the atom document request
 	 */
-	public AtomDocumentResponse doAtomDocument(AtomDocumentRequest adr) throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
-		return null;
-	}
-
-
-/*
-	public DepositResponse getDeposit(final String pCollection, final String pID) throws SWORDAuthenticationException, SWORDException, SWORDErrorException {
+	public AtomDocumentResponse doAtomDocument(AtomDocumentRequest pAtomDocumentRequest) throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
 		try {
-			// send response
-			DepositResponse tResponse = new DepositResponse(Deposit.CREATED);
-
-			LOG.debug("Collection is " + pCollection + " id is " + pID);
-			Builder tBuilder = new Builder();
-			File tFile = new File(new File(_props.getEntryStoreLocation(), pCollection), pID.replaceAll(":", "_") + ".xml");
-			if (tFile.exists()) {
-				Document tDoc = tBuilder.build();
-				SWORDEntry tEntry = new SWORDEntry();
-				tEntry.unmarshall(tDoc.getRootElement());
-				tResponse.setEntry(tEntry);
-				tisFile = true;
-			}	
-			if (!tisFile) { // check if its a directory
+			if (pAtomDocumentRequest.getUsername() != null) {
+				this.authenticates(pAtomDocumentRequest.getUsername(), pAtomDocumentRequest.getPassword());
 			}
+
+			// send response
+			AtomDocumentResponse tResponse = new AtomDocumentResponse(HttpServletResponse.SC_OK);
+			String[] tLocationArray = pAtomDocumentRequest.getLocation().split("/");
+			String tPid = tLocationArray[tLocationArray.length - 1].replaceAll(":", "_");
+			Builder tBuilder = new Builder();
+			File tFile = new File(_props.getEntryStoreLocation(), tPid);
+			LOG.debug("Looking for " + tFile.getPath());
+			if (tFile.exists() && tFile.isDirectory()) {
+				// return RSS of directory entries
+			} else {
+				String tCollection = tLocationArray[tLocationArray.length - 2].replaceAll(":", "_");
+				File tItem = new File(new File(_props.getEntryStoreLocation(), tCollection), tPid + ".xml");
+				LOG.debug("Looking for item " + tItem.getPath());
+				if (tItem.exists()) {
+					Document tDoc = tBuilder.build(new FileInputStream(tItem));
+
+					SWORDEntry tEntry = new SWORDEntry();
+
+					tEntry.unmarshall(tDoc.getRootElement());
+					tResponse.setEntry(tEntry);
+				} else {
+					// Requested item doesn't exist
+					LOG.error("Couldn't find " + pAtomDocumentRequest.getLocation());
+					throw new SWORDException("Couldn't find " + pAtomDocumentRequest.getLocation());
+				}
+			}	
 
 			return tResponse;
 		} catch (IOException tIOExcpt) {
@@ -325,7 +338,7 @@ public class FedoraServer implements SWORDServer {
 			LOG.error("Exception occured: " + tParseExcpt);
 			throw new SWORDException(tParseExcpt.getMessage());
 		}
-	}*/
+	}
 	
 	/**
 	 * Authenticate a user
