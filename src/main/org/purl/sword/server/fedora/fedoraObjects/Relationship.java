@@ -108,6 +108,20 @@ public class Relationship extends InlineDatastream	{
 		}
 	}
 
+	/**
+	 * remove all fedora:model attributes for non Fedora 3 objects or
+	 * else they don't ingest
+	 */
+	public void removeModels() {
+		List<Element> tNewList = new ArrayList<Element>();
+		for (Element tEl : _relationship) {
+			if (tEl.getNamespace() == null || !tEl.getNamespace().getURI().equals("info:fedora/fedora-system:def/model#")) {
+				tNewList.add(tEl);
+			}
+		}
+		_relationship = tNewList;
+	}
+
 	public String getPid() {
 		return _pid;
 	}

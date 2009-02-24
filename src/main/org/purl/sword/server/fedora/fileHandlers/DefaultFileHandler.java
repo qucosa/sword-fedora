@@ -539,10 +539,14 @@ public class DefaultFileHandler implements FileHandler {
 	protected String getGenericFileName(final DepositCollection pDeposit) {
 		LOG.debug("Filename '" + pDeposit.getFilename() + "'");
 		String tFilename = "";
-		if (pDeposit.getFilename() == null) {
+		if (pDeposit.getFilename() == null && pDeposit.getContentDisposition() == null) {
 			tFilename = "upload";
 		} else {
-			tFilename = this.getValidFileName(pDeposit.getFilename());
+			if (pDeposit.getFilename() != null) {
+				tFilename = this.getValidFileName(pDeposit.getFilename());
+			} else {	
+				tFilename = this.getValidFileName(pDeposit.getContentDisposition());
+			}	
 		}
 		return tFilename;
 	}

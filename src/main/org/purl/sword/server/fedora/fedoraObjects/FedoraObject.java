@@ -181,6 +181,11 @@ public class FedoraObject {
 	public Relationship getRelationships() {
 		// Ensure relationship has the PID
 		_relationship.setPid(this.getPid());
+		if (!_fedoraVersion.startsWith("3")) {
+			// remove all fedora:model attributes for non Fedora 3 objects or
+			// else they don't ingest
+			_relationship.removeModels();
+		}
 		return _relationship;
 	}
 
