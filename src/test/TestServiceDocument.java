@@ -17,6 +17,8 @@ import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
 import org.jdom.JDOMException;
 
+import java.util.List;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -50,6 +52,44 @@ public class TestServiceDocument {
 
 		SAXBuilder tBuilder = new SAXBuilder();
 		return tBuilder.build(tMethod.getResponseBodyAsStream());
+	}
+
+	/**
+	 * Test 1.1 Package support in Service Description of SWORD 1.3 Spec
+	 */
+	@Test
+	@SuppressWarnings(value={"unchecked"})
+	public void testPackaging() throws IOException, JDOMException {
+		Document tServiceDoc = this.getServiceDoc();
+
+		XPath tPath = XPath.newInstance("/app:service/app:workspace/app:collection/sword:packaging");
+		tPath.addNamespace(APP);
+		tPath.addNamespace(SWORD);
+		List<Element> tPackagingList = (List<Element>)tPath.selectNodes(tServiceDoc);
+		for (Element tPackagingEl : tPackagingList) {
+			if (tPackagingEl.getAttributeValue("q") != null) {
+				try {
+					double tNum = Double.parseDouble(tPackagingEl.getAttributeValue("q"));
+					assertTrue("q attribute of sword:packaging is greater than 1", tNum > 1.0);
+					assertTrue("q attribute of sword:packaging is less than 0", tNum < 0.0);
+					assertTrue("q attribute is longer than 3 decimial places", tPackagingEl.getAttributeValue("q").split(".")[1].length() > 3);
+				} catch (NumberFormatException nfe) {
+					fail("q attribute of sword:packaging is not a double");
+				}
+			}
+		}
+	}
+
+	@Test
+	public void testAcceptPresent() throws IOException, JDOMException {
+		Document tServiceDoc = this.getServiceDoc();
+
+		XPath tPath = XPath.newInstance("/app:service/app:workspace/app:collection/app:accept");
+		tPath.addNamespace(APP);
+		tPath.addNamespace(SWORD);
+		List tAccepts = tPath.selectNodes(tServiceDoc);
+		assertNotNull("app:accept's elements should be present", tAccepts);
+		assertFalse("There should be at least one app:accept's element", tAccepts.isEmpty());
 	}
 
 	@Test
