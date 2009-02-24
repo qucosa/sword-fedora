@@ -8,9 +8,10 @@
   <property name="tomcat"  location="/usr/local/tomcat"/>
 
   <!-- unit test properties -->
-  <property name="example_dir"  location="doc/Example Deposits"/>
-  <property name="test-service-doc" value="http://localhost/sword/servicedocument" />
+	<property name="example_dir"  location="doc/Example Deposits"/>
+	<property name="test-service-doc" value="http://localhost/sword/servicedocument" />
 	<property name="deposit_uri" value="http://localhost/sword/deposit/collection:open" />
+	<property name="limited-deposit_uri" value="http://localhost/sword/deposit/collection:closed" />
 	<property name="base_fedora_url" value="http://localhost:8080/fedora/get" />
 
 
@@ -83,6 +84,7 @@
 		</javac> 
 		<java classname="TestDeposit" classpathref="base.path"> 
 			<sysproperty key="deposit_uri" value="${deposit_uri}" />
+			<sysproperty key="limited-deposit_uri" value="${limited-deposit_uri}" />
 		</java>
 		<java classname="TestServiceDocument" classpathref="base.path">
 			<sysproperty key="service_doc" value="${test-service-doc}" />
