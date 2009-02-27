@@ -50,7 +50,15 @@ import java.io.IOException;
 import org.jdom.Element;
 import org.jdom.Namespace; 
 
-import fedora.client.FedoraClient;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 
 import org.purl.sword.server.fedora.utils.XMLProperties;
 
@@ -94,10 +102,43 @@ public class LocalDatastream extends Datastream {
 	 */
 	public void upload(final String pUsername, final String pPassword) throws IOException, SWORDException {
 		if (_uploadedURL == null) { // Ensure no one uploads same object twice
-			FedoraClient tFedora = new FedoraClient(new XMLProperties().getFedoraURL(), pUsername, pPassword);
+			//FedoraClient tFedora = new FedoraClient(new XMLProperties().getFedoraURL(), pUsername, pPassword);
 			if (new File(this.getPath()).exists()) {
-				LOG.debug("Uploading " + this.getPath());
-				_uploadedURL = tFedora.uploadFile(new File(this.getPath()));
+				HttpClient tClient = new HttpClient();
+				tClient.getParams().setAuthenticationPreemptive(true);
+
+				Credentials tUserPass = new UsernamePasswordCredentials(pUsername, pPassword);
+				tClient.getState().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM), tUserPass);
+
+				// execute and get the response
+				LOG.error("Uploading " + this.getPath() + " to " + new XMLProperties().getFedoraURL() + "/management/upload");
+				PostMethod tPost = new PostMethod(new XMLProperties().getFedoraURL() + "/management/upload");
+				tPost.getParams().setParameter("Connection","Keep-Alive");
+
+				LOG.debug("Content length: " + tPost.getRequestHeader("Content-length") + " content type " + tPost.getRequestHeader("Content-Type"));
+				tPost.setContentChunked(true);
+
+				// add the file part
+				Part[] parts = { new FilePart("file", new File(this.getPath())) };
+				tPost.setRequestEntity(new MultipartRequestEntity(parts, tPost.getParams()));
+				LOG.debug("Multipart length: " + tPost.getRequestEntity().getContentLength());
+		
+				int responseCode = tClient.executeMethod(tPost);
+				if (responseCode != 201) {
+					LOG.error("Couldn't upload " + this.getPath() + " none 201 result:" + responseCode);
+					throw new IOException("Couldn't upload file: " + this.getPath());
+				}
+				String body = null;
+				try {
+					body = tPost.getResponseBodyAsString();
+				} catch (Exception e) {
+					LOG.warn("Error reading response body", e);
+				}
+				if (body == null) {
+					body = "[empty response body]";
+				}
+			LOG.error("Body" + body);		
+				_uploadedURL = body.trim().replaceAll("\n", " ");
 			} else{
 				LOG.error("File '" + this.getPath() + "' dosn't exist");
 				throw new IOException("File doesn't exists: " + this.getPath());
