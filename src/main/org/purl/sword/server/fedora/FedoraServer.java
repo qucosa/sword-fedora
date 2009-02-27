@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 26th February 2009
+  * Date: 18 October 2007 
   *
   */
 
@@ -110,6 +110,7 @@ public class FedoraServer implements SWORDServer {
 		_props = new XMLProperties();
 	
 		try {
+			LOG.debug("Connecting to " + _props.getFedoraURL() + "/services/access");
 			FedoraAPIMService tService = new FedoraAPIMServiceLocator();
 			((FedoraAPIMServiceLocator)tService).setmanagementEndpointAddress(_props.getFedoraURL() + "/services/management");
 			_APIM = tService.getmanagement();
