@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.utils;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This class controls access to the properties file. If you need to add properties then you should
   * add the access methods to this class rathern than getting the XML Document its self. This ensures 

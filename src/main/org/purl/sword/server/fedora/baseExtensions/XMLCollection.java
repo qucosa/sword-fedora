@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.baseExtensions;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This extends the base file and allows it to be created from a XML config file
   */

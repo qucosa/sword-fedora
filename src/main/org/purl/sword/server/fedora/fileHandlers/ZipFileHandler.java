@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.fileHandlers;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This class handles Zip file deposits.
   *

@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.fileHandlers;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This is the catch all for files which are not recognised by the other 
   * file handlers. You should extends this class if you are writing new 

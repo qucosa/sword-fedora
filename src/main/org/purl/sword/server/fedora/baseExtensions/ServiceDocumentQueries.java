@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.baseExtensions;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This is an interface to ensure that the implementation of the service document always has
   * these requried methods. The methods are to do with permissions and also allows retrieval 

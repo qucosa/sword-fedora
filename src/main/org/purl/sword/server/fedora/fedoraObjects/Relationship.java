@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.fedoraObjects;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This encapsulates the RELS-EXT datastream and can be converted to and from XML
   *

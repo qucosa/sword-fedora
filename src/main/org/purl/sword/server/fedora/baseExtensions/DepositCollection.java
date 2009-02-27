@@ -38,7 +38,7 @@ package org.purl.sword.server.fedora.baseExtensions;
   *
   * @author Glen Robson
   * @version 1.0
-  * Date: 18 October 2007 
+  * Date: 26th February 2009
   *
   * This class extends the deposit clas but adds in the collection pid
   * so that it is easily accessible with the deposit
