@@ -139,5 +139,20 @@ if ("access".equals(portName)) {
     public void setEndpointAddress(javax.xml.namespace.QName portName, java.lang.String address) throws javax.xml.rpc.ServiceException {
         setEndpointAddress(portName.getLocalPart(), address);
     }
+protected org.apache.axis.EngineConfiguration getEngineConfiguration() {
+System.out.println("Calling engine config");
+    java.lang.StringBuffer sb = new java.lang.StringBuffer();
+    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+    sb.append("<deployment name=\"defaultClientConfig\"\r\n");
+    sb.append("xmlns=\"http://xml.apache.org/axis/wsdd/\"\r\n");
+    sb.append("xmlns:java=\"http://xml.apache.org/axis/wsdd/providers/java\">\r\n");
+    sb.append("<transport name=\"http\" pivot=\"java:org.apache.axis.transport.http.CommonsHTTPSender\" />\r\n");
+    sb.append("<transport name=\"local\" pivot=\"java:org.apache.axis.transport.local.LocalSender\" />\r\n");
+    sb.append("<transport name=\"java\" pivot=\"java:org.apache.axis.transport.java.JavaSender\" />\r\n");
+    sb.append("</deployment>\r\n");
+    org.apache.axis.configuration.XMLStringProvider config = 
+        new org.apache.axis.configuration.XMLStringProvider(sb.toString());
+    return config;
+}
 
 }
