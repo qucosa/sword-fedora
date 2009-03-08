@@ -18,21 +18,7 @@ public class AccessSoapBindingStub extends org.apache.axis.client.Stub implement
     static {
         _operations = new org.apache.axis.description.OperationDesc[9];
         _initOperationDesc1();
-	org.apache.commons.httpclient.params.DefaultHttpParams.setHttpParamsFactory(new org.apache.commons.httpclient.params.DefaultHttpParamsFactory()
-						 {
-						     /**
-						      * @see org.apache.commons.httpclient.params.DefaultHttpParamsFactory#createParams()
-						      */
-						     protected org.apache.commons.httpclient.params.HttpParams createParams()
-						     {
-							 org.apache.commons.httpclient.params.HttpParams params = super.createParams();
-
-							 params.setParameter(org.apache.commons.httpclient.params.HttpClientParams.PREEMPTIVE_AUTHENTICATION, Boolean.TRUE);
-							 return params;
-						     }
-						 });
-
-    }
+	 }
 
     private static void _initOperationDesc1(){
         org.apache.axis.description.OperationDesc oper;
@@ -361,7 +347,6 @@ public class AccessSoapBindingStub extends org.apache.axis.client.Stub implement
 
     }
 
-	 @SuppressWarnings(value={"unchecked"})
     protected org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
         try {
             org.apache.axis.client.Call _call = super._createCall();
@@ -419,10 +404,6 @@ public class AccessSoapBindingStub extends org.apache.axis.client.Stub implement
                     }
                 }
             }
-
-	    java.util.Hashtable httpHeaders = new java.util.Hashtable();        
-	    httpHeaders.put(org.apache.axis.transport.http.HTTPConstants.HEADER_TRANSFER_ENCODING_CHUNKED, false);
-	    _call.setProperty(org.apache.axis.transport.http.HTTPConstants.REQUEST_HEADERS, httpHeaders);
 
             return _call;
         }
