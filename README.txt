@@ -23,10 +23,10 @@ CONTENTS
 
 This software requires the following packages:
 
-Fedora 2.2
-tomcat (Tested using Fedora installed tomcat jakarta-tomcat-5.0.28)
-java 1.5
-ant 1.6.5
+Fedora 2.2 or higher
+tomcat
+java 1.5+
+ant
 
 1.2 DOWNLOAD AND EXTRACT
 ------------------------
