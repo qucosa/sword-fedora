@@ -174,6 +174,9 @@ public class XMLServiceDocument extends ServiceDocument implements ServiceDocume
 		// Check to see if user is allowed to deposit in collection
 		try {
 			Element tUsersEl = (Element)XPath.selectSingleNode(_serviceDocEl, "./workspace/collection[@collection_pid='" + pCollectionPID + "']/users");
+			if (tUsersEl == null) {
+				throw new SWORDException("There is a problem with the servie document as the users element for collection " + pCollectionPID + " could not be found");
+			}
 			Element tUser = (Element)XPath.selectSingleNode(tUsersEl, "./user[. = '" + pDepositer + "']");
 			if (!tUsersEl.getChildren().isEmpty() && tUser == null) {
 				return false;
