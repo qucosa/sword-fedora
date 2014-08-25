@@ -1,4 +1,8 @@
 <project name="sword" default="jar" basedir=".">
+  
+  <!-- include build options -->
+  <property file="build.properties"/>
+        
   <!-- set global properties for this build -->
   <property name="src" location="src/main"/>
   <property name="src-test" location="src/test"/>
@@ -14,7 +18,6 @@
 	<property name="limited-deposit_uri" value="http://localhost/sword/deposit/collection:closed" />
 	<property name="base_fedora_url" value="http://localhost:8080/fedora/get" />
 
-
   <target name="clean" description="clean up" >
     <delete dir="${build}"/>
   </target>
@@ -23,6 +26,7 @@
       <pathelement location="${build}/classes"/>
       <pathelement location="${build}/test-classes"/>
       <pathelement location="${tomcat}/common/lib/servlet-api.jar"/>
+      <pathelement location="${tomcat}/lib/servlet-api.jar"/>
       <fileset dir="${lib}">
         <include name="**/*.jar"/>
       </fileset>
