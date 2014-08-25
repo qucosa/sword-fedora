@@ -1,6 +1,7 @@
 
 CONTENTS
 
+0. DISCLAIMER
 1. INSTALL
 1.1 REQUIREMENTS
 1.2 DOWNLOAD AND EXTRACT
@@ -14,6 +15,14 @@ CONTENTS
 3.1 CHANGING THE WAY SERVICE DOCUMENTS ARE GENERATED
 3.2 ADDING NEW FILE HANDLERS
 3.3 CLASS HIERARCHY
+
+0. DISCLAIMER
+-------------
+
+This is a Git fork of the SVN project at http://sourceforge.net/p/sword-app
+
+The conversion was manuell and not via GitHub project import. There will be no
+    update to the master branch if code changes on Source Forge.
 
 1. Install
 ----------
