@@ -63,7 +63,6 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import java.io.FileInputStream;
 import java.io.File;
@@ -80,7 +79,7 @@ public class XMLProperties {
 		SAXBuilder tBuilder = new SAXBuilder();
 		LOG.debug("Loading " + StartupServlet.getPropertiesLocation());
 		try {
-			_props = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation()));
+			_props = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation().toFile()));
 		} catch (IOException tIOExcpt) {
 			LOG.error("Couldn't open properties file " + tIOExcpt.toString());
 		} catch (JDOMException tJDOMExcpt) {
@@ -164,7 +163,7 @@ public class XMLProperties {
 	/**
 	 * This returns the URL to the object metadata page for a specific PID
 	 *
-	 * @param String the object's pid
+	 * @param pPID The object's pid
 	 * @return String the URL to the object's metadata page
 	 * @throws SWORDException if there was a problem reading the config file
 	 */
@@ -188,8 +187,8 @@ public class XMLProperties {
 	/**
 	 * This returns the URL for the file that was ingested 
 	 *
-	 * @param String the object's pid
-	 * @param String the datastream name
+	 * @param pPID The object's pid
+	 * @param pDSId The datastream name
 	 * @return String the URL to the file that was ingested
 	 * @throws SWORDException if there was a problem reading the config file
 	 */
@@ -294,8 +293,8 @@ public class XMLProperties {
 			throw new SWORDException(tMessage, tJDOMExcpt);
 		}
 
-		return StartupServlet.getRealPath(tEntryLoc.getText());
-	}
+        return StartupServlet.realPathHelper(tEntryLoc.getText());
+    }
 	/**
 	 * This returns the directory where the sub service documents are stored relative to the web app directory
 	 *
@@ -323,7 +322,7 @@ public class XMLProperties {
 	/**
 	 * This is the method which retrieves the Service document from the properties file. 
 	 * 
-    * @param String the user that is requesting the ServiceDocument
+    * @param pOnBehalfOf The user that is requesting the ServiceDocument
 	 * @return ServiceDocument the service document
 	 * @throws SWORDException if there was a problem reading the config file
 	 */
@@ -349,7 +348,7 @@ public class XMLProperties {
 		SAXBuilder tBuilder = new SAXBuilder();
 		Document tChildDocs = null; 
 		try {
-			tChildDocs = tBuilder.build(StartupServlet.getRealPath(new File(this.getSubSDDir(), pLocation).getPath()));
+            tChildDocs = tBuilder.build(StartupServlet.realPathHelper(new File(this.getSubSDDir(), pLocation).getPath()));
 		} catch (IOException tIOExcpt) {
 			String tMessage = "IO Exception occured on doServiceDocument method due to a problem accessing the properties file";
 			LOG.error(tMessage);
@@ -385,11 +384,11 @@ public class XMLProperties {
 	public Document getProps() {
 	    return _props;
 	}
-	
+
 	/**
 	 * Set props.
 	 * ** Use only when you don't have access to the source for XMLProperties **
-	 * @param props the value to set.
+	 * @param pProps The value to set.
 	 */
 	public void setProps(final Document pProps) {
 	     _props = pProps;
