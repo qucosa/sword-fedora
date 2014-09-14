@@ -41,8 +41,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 
 /**
  * This servlet sets up the log4j configuration and reads in the properties file
@@ -89,7 +88,7 @@ public class StartupServlet extends HttpServlet {
 
     private static ServletConfig CONFIG;
 
-    private static Path propertiesLocation;
+    private static String propertiesLocation;
     private final Logger log = Logger.getLogger(StartupServlet.class);
 
     /**
@@ -102,14 +101,14 @@ public class StartupServlet extends HttpServlet {
     }
 
     private void initializeLogging(String pathToLog4JConfig) {
-        Path logConfigPath = getAbsolutePathToResource(pathToLog4JConfig);
-        DOMConfigurator.configure(logConfigPath.toString());
-        log.info("Taking log4j config from: " + logConfigPath.toString());
+        String logConfigPath = getAbsolutePathToResource(pathToLog4JConfig);
+        DOMConfigurator.configure(logConfigPath);
+        log.info("Taking log4j config from: " + logConfigPath);
     }
 
     private void initializePropertiesLocation(String pathToProjectProperties) {
         propertiesLocation = getAbsolutePathToResource(pathToProjectProperties);
-        log.info("loading properties files from: " + propertiesLocation.toString());
+        log.info("loading properties files from: " + propertiesLocation);
     }
 
     private String getInitParameterConsideringOverride(String name) {
@@ -121,23 +120,22 @@ public class StartupServlet extends HttpServlet {
         return (initParameter != null) && (!initParameter.isEmpty());
     }
 
-    private Path getAbsolutePathToResource(String resourcePath) {
+    private String getAbsolutePathToResource(String resourcePath) {
         if (resourcePath.startsWith("/")) {
-            return Paths.get(resourcePath);
+            File file = new File(resourcePath);
+            return file.getAbsolutePath();
         } else {
             // assume file is in servlet context
-            return Paths.get(this.getServletContext().getRealPath(resourcePath));
+            return this.getServletContext().getRealPath(resourcePath);
         }
     }
 
-    public static Path getPropertiesLocation() {
+    public static String getPropertiesLocation() {
         return propertiesLocation;
     }
 
     public static String realPathHelper(String resourcePath) {
-        return Paths.get(CONFIG.getServletContext().getRealPath(resourcePath))
-                .toAbsolutePath()
-                .toString();
+        return CONFIG.getServletContext().getRealPath(resourcePath);
     }
 
 }

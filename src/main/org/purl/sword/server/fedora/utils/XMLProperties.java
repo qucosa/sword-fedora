@@ -79,7 +79,7 @@ public class XMLProperties {
 		SAXBuilder tBuilder = new SAXBuilder();
 		LOG.debug("Loading " + StartupServlet.getPropertiesLocation());
 		try {
-			_props = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation().toFile()));
+			_props = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation()));
 		} catch (IOException tIOExcpt) {
 			LOG.error("Couldn't open properties file " + tIOExcpt.toString());
 		} catch (JDOMException tJDOMExcpt) {

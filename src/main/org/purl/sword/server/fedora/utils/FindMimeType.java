@@ -71,7 +71,7 @@ public class FindMimeType {
 		if (_mimeTypes == null) {
 			try {
 				SAXBuilder tBuilder = new SAXBuilder();
-				Document tProps = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation().toFile()));
+				Document tProps = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation()));
 				LOG.debug("Building props");
 				String tMimeTypesFilePath = tProps.getRootElement().getChild("files").getChild("mime-type").getText();
 				LOG.debug("Loading props file from " + tMimeTypesFilePath);
