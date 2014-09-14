@@ -66,6 +66,7 @@ import org.purl.sword.server.fedora.fileHandlers.FileHandlerFactory;
 
 import javax.xml.rpc.ServiceException;
 
+import java.io.*;
 import java.rmi.RemoteException;
 
 import org.apache.axis.client.Stub;
@@ -87,11 +88,6 @@ import org.purl.sword.server.fedora.api.FedoraAPIAServiceLocator;
 import org.purl.sword.server.fedora.api.FedoraAPIAService;
 import org.purl.sword.server.fedora.api.FedoraAPIA;
 import org.purl.sword.server.fedora.api.RepositoryInfo;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.File;
 
 import java.util.Iterator;
 
@@ -247,23 +243,10 @@ public class FedoraServer implements SWORDServer {
 				}
 			}
 			tResponse.setLocation(tLink.getHref());
-			// and save response for further gets
-			File tCollectionDir = new File(_props.getEntryStoreLocation(), tCollectionPID.replaceAll(":", "_"));
-			if (!tCollectionDir.exists()) {
-				tCollectionDir.mkdir();
-			}
-			FileOutputStream tStream = new FileOutputStream(new File(tCollectionDir, tEntry.getId().replaceAll(":", "_") + ".xml"));
-         Serializer tSerializer = new Serializer(tStream, "UTF-8");
-         tSerializer.setIndent(3);
-
-			Document tDoc = new Document(tEntry.marshall());
-			tSerializer.write(tDoc);  
+			// and save response for further gets, but don't crash since the everything went fine so far
+            cacheResponse(tCollectionPID, tEntry);
 
 			return tResponse;
-		} catch (IOException tIOExcpt) {
-			tIOExcpt.printStackTrace();
-			LOG.error("Exception occured: " + tIOExcpt);
-			throw new SWORDException(tIOExcpt.getMessage());
 		} catch (SWORDException tException) {
 			tException.printStackTrace();
 			LOG.error("Exception occured: " + tException);
@@ -279,7 +262,28 @@ public class FedoraServer implements SWORDServer {
 		}
 	}
 
-	/**
+    private void cacheResponse(String tCollectionPID, SWORDEntry tEntry) throws SWORDException {
+        File tCollectionDir = new File(_props.getEntryStoreLocation(), tCollectionPID.replaceAll(":", "_"));
+        if (!tCollectionDir.exists()) {
+            if (tCollectionDir.mkdirs()) {
+            } else {
+                LOG.warn("Cannot create directory: " + tCollectionDir.toString());
+            }
+        }
+        FileOutputStream tStream = null;
+        try {
+            tStream = new FileOutputStream(
+                    new File(tCollectionDir, tEntry.getId().replaceAll(":", "_") + ".xml"));
+            Serializer tSerializer = new Serializer(tStream, "UTF-8");
+            tSerializer.setIndent(3);
+            Document tDoc = new Document(tEntry.marshall());
+            tSerializer.write(tDoc);
+        } catch (IOException e) {
+            LOG.error("Error while caching response: " + e.getMessage());
+        }
+    }
+
+    /**
 	 * Answer a request for an entry document
 	 * 
 	 * @param adr The Atom Document Request object
