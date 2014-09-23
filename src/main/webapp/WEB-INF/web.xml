@@ -54,9 +54,15 @@
     <servlet-name>servicedocument</servlet-name>
     <url-pattern>/servicedocument/*</url-pattern>
   </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>deposit</servlet-name>
     <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>StartupServlet</servlet-name>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
 
 </web-app>
