@@ -1,5 +1,4 @@
-
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -40,7 +39,7 @@
   * Date: 26th February 2009
   *
   */
-
+package org.purl.sword.server.fedora;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -60,14 +59,14 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class TestServiceDocument {
+public class ServiceDocumentIT {
 	private Namespace SWORD = Namespace.getNamespace("sword","http://purl.org/net/sword/");
 	private Namespace ATOM = Namespace.getNamespace("atom","http://www.w3.org/2005/Atom");
 	private Namespace APP = Namespace.getNamespace("app","http://www.w3.org/2007/app");
 
 	protected String _serviceDocURL = "";
 
-	public TestServiceDocument() {
+	public ServiceDocumentIT() {
 			_serviceDocURL = System.getProperty("service_doc");
 	}
 	
@@ -143,6 +142,6 @@ public class TestServiceDocument {
 	}
 
 	public static void main(final String pArgs[]) throws IOException {
-		org.junit.runner.JUnitCore.main(TestServiceDocument.class.getName());
+		org.junit.runner.JUnitCore.main(ServiceDocumentIT.class.getName());
 	}
 }

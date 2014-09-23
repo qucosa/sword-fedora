@@ -1,4 +1,4 @@
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -39,6 +39,7 @@
   * Date: 26th February 2009
   *
   */
+package org.purl.sword.server.fedora;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -64,8 +65,8 @@ import java.net.URL;
 
 import static org.junit.Assert.*;
 
-public class TestExampleDeposits {
-	private static final Logger LOG = Logger.getLogger(TestExampleDeposits.class);
+public class ExampleDepositsIT {
+	private static final Logger LOG = Logger.getLogger(ExampleDepositsIT.class);
 
 	private Namespace SWORD = Namespace.getNamespace("sword","http://purl.org/net/sword/");
 	private Namespace ATOM = Namespace.getNamespace("atom","http://www.w3.org/2005/Atom");
@@ -74,7 +75,7 @@ public class TestExampleDeposits {
 	protected String _fedoraURL = null;
 	protected String _exampleDir = null; 
 
-	public TestExampleDeposits() {
+	public ExampleDepositsIT() {
 		_exampleDir = System.getProperty("example_dir");
 		_depositUri = System.getProperty("deposit_uri");
 		_fedoraURL = System.getProperty("fedora_base");
@@ -198,6 +199,6 @@ public class TestExampleDeposits {
 	}
 
 	public static void main(final String pArgs[]) throws IOException, SAXException {
-		org.junit.runner.JUnitCore.main(TestExampleDeposits.class.getName());
+		org.junit.runner.JUnitCore.main(ExampleDepositsIT.class.getName());
 	}
 }

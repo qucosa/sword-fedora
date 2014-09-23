@@ -1,4 +1,4 @@
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -39,6 +39,7 @@
   * Date: 26th February 2009 
   *
   */
+package org.purl.sword.server.fedora;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -59,14 +60,14 @@ import java.net.URL;
 
 import static org.junit.Assert.*;
 
-public class TestDeposit {
+public class DepositIT {
 	private Namespace SWORD = Namespace.getNamespace("sword","http://purl.org/net/sword/");
 	private Namespace ATOM = Namespace.getNamespace("atom","http://www.w3.org/2005/Atom");
 
 	protected String _depositUri = null;
 	protected String _limitedDepositUri = null;
 
-	public TestDeposit() {
+	public DepositIT() {
 		_depositUri = System.getProperty("deposit_uri");
 		_limitedDepositUri = System.getProperty("limited-deposit_uri");
 	}
@@ -472,6 +473,6 @@ public class TestDeposit {
 
 
 	public static void main(final String pArgs[]) throws IOException, JDOMException {
-		org.junit.runner.JUnitCore.main(TestDeposit.class.getName());
+		org.junit.runner.JUnitCore.main(DepositIT.class.getName());
 	}
 }
