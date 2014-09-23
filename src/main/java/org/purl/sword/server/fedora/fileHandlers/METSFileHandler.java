@@ -43,26 +43,20 @@ package org.purl.sword.server.fedora.fileHandlers;
   * This class ingests mets documents.
   */
 
+import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.SWORDEntry;
-
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
-
+import org.purl.sword.server.fedora.fedoraObjects.Datastream;
 import org.purl.sword.server.fedora.fedoraObjects.DublinCore;
 import org.purl.sword.server.fedora.fedoraObjects.Relationship;
-import org.purl.sword.server.fedora.fedoraObjects.Datastream;
-
 import org.purl.sword.server.fedora.utils.METSObject;
 
-import org.jdom.input.SAXBuilder;
-import org.jdom.JDOMException;
-
 import java.io.IOException;
-
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 public class METSFileHandler extends DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(METSFileHandler.class);

@@ -46,7 +46,6 @@ package org.purl.sword.server.fedora.baseExtensions;
   */
 
 import org.jdom.Element;
-
 import org.purl.sword.base.SWORDException;
 
 public interface ServiceDocumentQueries {

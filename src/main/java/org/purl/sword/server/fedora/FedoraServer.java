@@ -42,57 +42,33 @@ package org.purl.sword.server.fedora;
   *
   */
 
-import org.purl.sword.server.SWORDServer;
-import org.purl.sword.base.Deposit;
-import org.purl.sword.base.DepositResponse;
-import org.purl.sword.base.AtomDocumentRequest;
-import org.purl.sword.base.AtomDocumentResponse;
-import org.purl.sword.base.SWORDAuthenticationException;
-import org.purl.sword.base.SWORDException;
-import org.purl.sword.base.SWORDErrorException;
-import org.purl.sword.base.ErrorCodes;
-import org.purl.sword.base.SWORDEntry;
-import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.ServiceDocumentRequest;
-import org.purl.sword.base.UnmarshallException;
-
-import org.purl.sword.atom.Link;
-
-import org.purl.sword.server.fedora.utils.XMLProperties;
-import org.purl.sword.server.fedora.baseExtensions.ServiceDocumentQueries;
-import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
-import org.purl.sword.server.fedora.fileHandlers.FileHandler;
-import org.purl.sword.server.fedora.fileHandlers.FileHandlerFactory;
-
-import javax.xml.rpc.ServiceException;
-
-import java.io.*;
-import java.rmi.RemoteException;
-
-import org.apache.axis.client.Stub;
-import org.apache.axis.AxisFault;
-
-import org.w3c.dom.Element;
-
-import javax.servlet.http.HttpServletResponse;
-
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
-
-import org.purl.sword.server.fedora.api.FedoraAPIMServiceLocator;
-import org.purl.sword.server.fedora.api.FedoraAPIMService;
-import org.purl.sword.server.fedora.api.FedoraAPIM;
-import org.purl.sword.server.fedora.api.FedoraAPIAServiceLocator;
-import org.purl.sword.server.fedora.api.FedoraAPIAService;
-import org.purl.sword.server.fedora.api.FedoraAPIA;
-import org.purl.sword.server.fedora.api.RepositoryInfo;
-
-import java.util.Iterator;
-
+import org.apache.axis.AxisFault;
+import org.apache.axis.client.Stub;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.purl.sword.atom.Link;
+import org.purl.sword.base.*;
+import org.purl.sword.server.SWORDServer;
+import org.purl.sword.server.fedora.api.*;
+import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
+import org.purl.sword.server.fedora.baseExtensions.ServiceDocumentQueries;
+import org.purl.sword.server.fedora.fileHandlers.FileHandler;
+import org.purl.sword.server.fedora.fileHandlers.FileHandlerFactory;
+import org.purl.sword.server.fedora.utils.XMLProperties;
+import org.w3c.dom.Element;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.rpc.ServiceException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.Iterator;
 
 public class FedoraServer implements SWORDServer {
 	public static final String VERSION = "1.3";

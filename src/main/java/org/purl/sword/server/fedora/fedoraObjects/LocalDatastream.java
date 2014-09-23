@@ -44,28 +44,23 @@ package org.purl.sword.server.fedora.fedoraObjects;
   * and need to be uploaded to fedora. These files are set to a Managed state
   */
 
-import java.io.File;
-import java.io.IOException;
-
-import org.jdom.Element;
-import org.jdom.Namespace; 
-
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.log4j.Logger;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.purl.sword.base.SWORDException;
 import org.purl.sword.server.fedora.utils.XMLProperties;
 
-import org.purl.sword.base.SWORDException;
-
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
 
 public class LocalDatastream extends Datastream {
 	private static final Logger LOG = Logger.getLogger(LocalDatastream.class);

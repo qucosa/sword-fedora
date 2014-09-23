@@ -42,28 +42,22 @@
   */
 
 
-import java.io.IOException;
-
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-
-import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.xpath.XPath;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
+import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TestServiceDocument {

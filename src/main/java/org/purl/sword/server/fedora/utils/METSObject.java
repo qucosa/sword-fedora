@@ -43,25 +43,16 @@ package org.purl.sword.server.fedora.utils;
   * This is a utility class to allow easy access to a METS document
   */
 
-import org.jdom.Element;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.JDOMException;
-import org.jdom.xpath.XPath;
-import org.jdom.Namespace;
-
-import org.purl.sword.server.fedora.fedoraObjects.DublinCore;
-import org.purl.sword.server.fedora.fedoraObjects.Relationship;
-import org.purl.sword.server.fedora.fedoraObjects.Datastream;
-import org.purl.sword.server.fedora.fedoraObjects.XMLInlineDatastream;
-import org.purl.sword.server.fedora.fedoraObjects.ManagedDatastream;
-import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.xpath.XPath;
+import org.purl.sword.server.fedora.fedoraObjects.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class METSObject {
 	private static final Logger LOG = Logger.getLogger(METSObject.class);

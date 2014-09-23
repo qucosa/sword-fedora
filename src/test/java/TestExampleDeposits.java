@@ -40,36 +40,29 @@
   *
   */
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.FileInputStream;
-import java.io.File;
-import java.io.InputStream;
-
-import org.jdom.input.SAXBuilder;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.JDOMException;
-
-import java.net.URL;
-
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+import static org.junit.Assert.*;
 
 public class TestExampleDeposits {
 	private static final Logger LOG = Logger.getLogger(TestExampleDeposits.class);

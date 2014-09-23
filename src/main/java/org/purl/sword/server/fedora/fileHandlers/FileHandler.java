@@ -44,10 +44,9 @@ package org.purl.sword.server.fedora.fileHandlers;
   * constructor which takes no parameters and throws no exceptions.
   */
 
+import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.SWORDEntry;
-
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 
 public interface FileHandler {

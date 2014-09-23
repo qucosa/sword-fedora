@@ -43,15 +43,11 @@ package org.purl.sword.server.fedora.baseExtensions;
   * This extends the base file and allows it to be created from a XML config file
   */
 
+import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.purl.sword.base.Collection;
 
-import org.jdom.Element;
-
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
 
 public class XMLCollection extends Collection {
 	private static final Logger LOG = Logger.getLogger(XMLCollection.class);

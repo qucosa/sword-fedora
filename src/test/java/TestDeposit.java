@@ -40,30 +40,24 @@
   *
   */
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.FileInputStream;
-
-import java.net.URL;
-
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.net.URL;
+
+import static org.junit.Assert.*;
 
 public class TestDeposit {
 	private Namespace SWORD = Namespace.getNamespace("sword","http://purl.org/net/sword/");

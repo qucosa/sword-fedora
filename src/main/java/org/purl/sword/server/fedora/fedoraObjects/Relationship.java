@@ -44,13 +44,13 @@ package org.purl.sword.server.fedora.fedoraObjects;
   *
   */
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.Document;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Relationship extends InlineDatastream	{
 	protected String _pid = "";

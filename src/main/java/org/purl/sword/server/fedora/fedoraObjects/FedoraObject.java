@@ -45,41 +45,26 @@ package org.purl.sword.server.fedora.fedoraObjects;
   *
   */
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-
-import org.purl.sword.server.fedora.utils.XMLProperties;
-
-import org.purl.sword.base.SWORDException;
-
-import org.jdom.Element;
-import org.jdom.Document;
-import org.jdom.Namespace; 
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-
-import java.net.MalformedURLException;
-
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-
-import java.rmi.RemoteException;
-
-import javax.xml.rpc.ServiceException;
-
 import org.apache.axis.client.Stub;
 import org.apache.axis.types.NonNegativeInteger;
-
-import org.purl.sword.server.fedora.api.FedoraAPIMServiceLocator;
-import org.purl.sword.server.fedora.api.FedoraAPIMService;
-import org.purl.sword.server.fedora.api.FedoraAPIM;
-import org.purl.sword.server.fedora.api.FedoraAPIAServiceLocator;
-import org.purl.sword.server.fedora.api.FedoraAPIAService;
-import org.purl.sword.server.fedora.api.FedoraAPIA;
-import org.purl.sword.server.fedora.api.RepositoryInfo;
-
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.purl.sword.base.SWORDException;
+import org.purl.sword.server.fedora.api.*;
+import org.purl.sword.server.fedora.utils.XMLProperties;
+
+import javax.xml.rpc.ServiceException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class FedoraObject {
 	private static final Logger LOG = Logger.getLogger(FedoraObject.class);

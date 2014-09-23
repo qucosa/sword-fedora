@@ -44,10 +44,10 @@ package org.purl.sword.server.fedora.fedoraObjects;
   * reseides in the repository
   *
   */
-import org.jdom.Element;
-import org.jdom.Namespace; 
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 public class ManagedDatastream extends Datastream {
 	private static final Logger LOG = Logger.getLogger(ManagedDatastream.class);

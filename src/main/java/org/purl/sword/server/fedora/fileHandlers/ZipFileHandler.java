@@ -44,27 +44,20 @@ package org.purl.sword.server.fedora.fileHandlers;
   *
   */
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.purl.sword.base.SWORDEntry;
+import org.purl.sword.base.SWORDException;
+import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 import org.purl.sword.server.fedora.fedoraObjects.Datastream;
 import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
 import org.purl.sword.server.fedora.utils.ZipFileAccess;
 
-import org.purl.sword.base.SWORDException;
-import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.SWORDEntry;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.File;
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-
-import org.apache.commons.io.IOUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZipFileHandler extends DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(ZipFileHandler.class);

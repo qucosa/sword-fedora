@@ -44,11 +44,10 @@ package org.purl.sword.server.fedora.fedoraObjects;
   * class also extends Datastream
   */
 
-import org.jdom.Element;
-import org.jdom.Document;
-import org.jdom.Namespace; 
-
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 public abstract class InlineDatastream extends Datastream {
 	private static final Logger LOG = Logger.getLogger(InlineDatastream.class);

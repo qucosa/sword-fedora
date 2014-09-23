@@ -44,28 +44,18 @@ package org.purl.sword.server.fedora.fileHandlers;
   * to the object when it has been ingested.
   * 
   */
-import org.purl.sword.server.fedora.fedoraObjects.Datastream;
-import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
-import org.purl.sword.server.fedora.fedoraObjects.Disseminator;
-import org.purl.sword.server.fedora.fedoraObjects.DSBinding;
-import org.purl.sword.server.fedora.fedoraObjects.Relationship;
-import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
-
-import org.purl.sword.base.SWORDException;
 
 import org.apache.commons.io.IOUtils;
-
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-
-import java.util.List;
-import java.util.ArrayList;
-
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
+import org.purl.sword.base.SWORDException;
+import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
+import org.purl.sword.server.fedora.fedoraObjects.*;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JpegHandler extends DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(JpegHandler.class);

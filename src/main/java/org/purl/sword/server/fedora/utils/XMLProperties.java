@@ -46,27 +46,23 @@ package org.purl.sword.server.fedora.utils;
   *
   */
 
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
+import org.purl.sword.base.Collection;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.Workspace;
-import org.purl.sword.base.Collection;
-
 import org.purl.sword.server.fedora.baseExtensions.XMLServiceDocument;
 
-import org.jdom.input.SAXBuilder;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.Element;
-import org.jdom.xpath.XPath;
-
-import org.apache.log4j.Logger;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import java.io.FileInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLProperties {
 	private static final Logger LOG = Logger.getLogger(XMLProperties.class);

@@ -44,13 +44,12 @@ package org.purl.sword.server.fedora.utils;
   * of a file.
   */
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
-
-import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -44,25 +44,21 @@ package org.purl.sword.server.fedora.utils;
   *
   */
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipEntry;
-import java.util.Enumeration;
-import java.util.Random;
-
-import org.purl.sword.server.fedora.utils.FindMimeType;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.purl.sword.base.SWORDException;
 import org.purl.sword.server.fedora.fedoraObjects.Datastream;
 import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
-
-import org.purl.sword.base.SWORDException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.apache.commons.io.IOUtils;
-
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class ZipFileAccess {
 	private static final Logger LOG = Logger.getLogger(ZipFileAccess.class);

@@ -45,58 +45,24 @@ package org.purl.sword.server.fedora.fileHandlers;
   * file handlers. It allows you to only extend the methods which you need to.
   */
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-
-import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.SWORDEntry;
+import org.purl.sword.atom.*;
 import org.purl.sword.base.Collection;
+import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.SWORDException;
-
-import org.purl.sword.atom.Source;
-import org.purl.sword.atom.Generator;
-import org.purl.sword.atom.Content;
-import org.purl.sword.atom.Link;
-import org.purl.sword.atom.Author;
-import org.purl.sword.atom.Contributor;
-import org.purl.sword.atom.Rights;
-import org.purl.sword.atom.Summary;
-import org.purl.sword.atom.Title;
-import org.purl.sword.atom.InvalidMediaTypeException;
-
+import org.purl.sword.base.ServiceDocument;
+import org.purl.sword.server.fedora.FedoraServer;
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 import org.purl.sword.server.fedora.baseExtensions.XMLServiceDocument;
-
+import org.purl.sword.server.fedora.fedoraObjects.*;
 import org.purl.sword.server.fedora.utils.XMLProperties;
-
-import org.purl.sword.server.fedora.FedoraServer;
-
-import org.purl.sword.server.fedora.fedoraObjects.FedoraObject;
-import org.purl.sword.server.fedora.fedoraObjects.DublinCore;
-import org.purl.sword.server.fedora.fedoraObjects.Relationship;
-import org.purl.sword.server.fedora.fedoraObjects.Datastream;
-import org.purl.sword.server.fedora.fedoraObjects.Disseminator;
-import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
-import org.purl.sword.server.fedora.fedoraObjects.Property;
-
-import org.apache.commons.io.IOUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
-
-import java.util.TimeZone;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(DefaultFileHandler.class);

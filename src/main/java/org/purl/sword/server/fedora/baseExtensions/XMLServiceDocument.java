@@ -44,23 +44,15 @@ package org.purl.sword.server.fedora.baseExtensions;
   * allows quering to find if a depositor has permission to deposit in a particular collection
   */
 
-import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.SWORDException;
-import org.purl.sword.base.Service;
-import org.purl.sword.base.Workspace;
-import org.purl.sword.base.Collection;
-
-import org.purl.sword.server.fedora.FedoraServer;
-
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
+import org.purl.sword.base.*;
+import org.purl.sword.server.fedora.FedoraServer;
 
-import java.util.List;
 import java.util.Iterator;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
+import java.util.List;
 
 public class XMLServiceDocument extends ServiceDocument implements ServiceDocumentQueries {
 	private static final Logger LOG = Logger.getLogger(XMLServiceDocument.class);

@@ -43,35 +43,26 @@ package org.purl.sword.server.fedora.fileHandlers;
   * This file handler ingests a zip file with a METS manifest
   */
 
-import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
-import org.purl.sword.server.fedora.fedoraObjects.Datastream;
-import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
-import org.purl.sword.server.fedora.fedoraObjects.DublinCore;
-import org.purl.sword.server.fedora.fedoraObjects.Relationship;
-import org.purl.sword.server.fedora.utils.ZipFileAccess;
-import org.purl.sword.server.fedora.utils.METSObject;
-
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
-import org.purl.sword.base.SWORDEntry;
+import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
+import org.purl.sword.server.fedora.fedoraObjects.Datastream;
+import org.purl.sword.server.fedora.fedoraObjects.DublinCore;
+import org.purl.sword.server.fedora.fedoraObjects.LocalDatastream;
+import org.purl.sword.server.fedora.fedoraObjects.Relationship;
+import org.purl.sword.server.fedora.utils.METSObject;
+import org.purl.sword.server.fedora.utils.ZipFileAccess;
 
-import org.jdom.input.SAXBuilder;
-import org.jdom.JDOMException;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.File;
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-
-import org.apache.commons.io.IOUtils;
-
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZipMETSFileHandler extends DefaultFileHandler implements FileHandler {
 	private static final Logger LOG = Logger.getLogger(ZipMETSFileHandler.class);

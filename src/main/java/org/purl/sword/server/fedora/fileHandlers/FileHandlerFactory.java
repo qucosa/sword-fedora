@@ -45,14 +45,14 @@ package org.purl.sword.server.fedora.fileHandlers;
   * handle the requested is returned. If none are matched a DefaultFileHandler is 
   * used.
   */
-import org.purl.sword.server.fedora.utils.XMLProperties;
-import org.purl.sword.base.SWORDException;
 
 import org.apache.log4j.Logger;
+import org.purl.sword.base.SWORDException;
+import org.purl.sword.server.fedora.utils.XMLProperties;
 
-import java.util.List;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class FileHandlerFactory {
 	private static final Logger LOG = Logger.getLogger(FileHandlerFactory.class);

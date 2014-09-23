@@ -44,10 +44,10 @@ package org.purl.sword.server.fedora.fedoraObjects;
   */
 
 import org.jdom.Element;
-import org.jdom.Namespace; 
+import org.jdom.Namespace;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public class Disseminator {
 	protected String _id = "";

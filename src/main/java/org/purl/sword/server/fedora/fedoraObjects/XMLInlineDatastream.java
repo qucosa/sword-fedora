@@ -43,9 +43,7 @@ package org.purl.sword.server.fedora.fedoraObjects;
   * Generic class which stores XML datastreams as Inline datastreams
   */
 
-import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.Namespace; 
 
 public class XMLInlineDatastream extends InlineDatastream {
 	protected Document _xml = null;
