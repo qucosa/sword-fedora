@@ -22,6 +22,19 @@
       The type of authentication used : [Basic|None]
     </description>
   </context-param>
+
+    <context-param>
+        <param-name>log-config</param-name>
+        <param-value>WEB-INF/log4j.xml</param-value>
+    </context-param>
+    <context-param>
+        <param-name>project.properties</param-name>
+        <param-value>WEB-INF/properties.xml</param-value>
+    </context-param>
+
+    <listener>
+      <listener-class>org.purl.sword.server.fedora.utils.StartupListener</listener-class>
+    </listener>
   
   <!-- Servlets -->
 
@@ -34,20 +47,6 @@
     <servlet-class>org.purl.sword.server.AtomDocumentServlet</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>StartupServlet</servlet-name>
-    <servlet-class>org.purl.sword.server.fedora.utils.StartupServlet</servlet-class>
-    <init-param>
-      <param-name>log-config</param-name>
-      <param-value>WEB-INF/log4j.xml</param-value>
-    </init-param>
-    <init-param>
-      <param-name>project.properties</param-name>
-      <param-value>WEB-INF/properties.xml</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
- </servlet>
-
 <!-- Servlet Mappings -->
 
   <servlet-mapping>
@@ -58,11 +57,6 @@
   <servlet-mapping>
     <servlet-name>deposit</servlet-name>
     <url-pattern>/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>StartupServlet</servlet-name>
-    <url-pattern>/</url-pattern>
   </servlet-mapping>
 
 </web-app>

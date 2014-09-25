@@ -66,15 +66,15 @@ public class FindMimeType {
 	 * @return String the mime type
 	 */ 
 	public static String getMimeType(final String pExtension) {
-		LOG.debug("Loading " + StartupServlet.getPropertiesLocation());
+		LOG.debug("Loading " + StartupListener.getPropertiesLocation());
 		if (_mimeTypes == null) {
 			try {
 				SAXBuilder tBuilder = new SAXBuilder();
-				Document tProps = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation()));
+				Document tProps = tBuilder.build(new FileInputStream(StartupListener.getPropertiesLocation()));
 				LOG.debug("Building props");
 				String tMimeTypesFilePath = tProps.getRootElement().getChild("files").getChild("mime-type").getText();
 				LOG.debug("Loading props file from " + tMimeTypesFilePath);
-                _mimeTypes = tBuilder.build(new FileInputStream(StartupServlet.realPathHelper(tMimeTypesFilePath)));
+                _mimeTypes = tBuilder.build(new FileInputStream(StartupListener.realPathHelper(tMimeTypesFilePath)));
 				LOG.debug("Built mime-types xml");
 			} catch (IOException tIOExcpt) {
 				LOG.error("Couldn't open properties file " + tIOExcpt.toString());

@@ -82,8 +82,8 @@ public class FedoraServer implements SWORDServer {
 		_props = new XMLProperties();
 	
 		try {
-			LOG.debug("Connecting to " + _props.getFedoraURL() + "/services/access");
-			FedoraAPIMService tService = new FedoraAPIMServiceLocator();
+            LOG.debug("Connecting to " + _props.getFedoraURL() + "/services/access");
+           FedoraAPIMService tService = new FedoraAPIMServiceLocator();
 			((FedoraAPIMServiceLocator)tService).setmanagementEndpointAddress(_props.getFedoraURL() + "/services/management");
 			_APIM = tService.getmanagement();
 

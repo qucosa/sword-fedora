@@ -48,7 +48,7 @@ import org.jdom.Element;
 import org.jdom.Namespace; 
 
 public class Property {
-	public enum TYPE { INTERNAL, EXTERNAL };
+	public enum TYPE { INTERNAL, EXTERNAL }
 
 	protected String _name;
 	protected String _value;

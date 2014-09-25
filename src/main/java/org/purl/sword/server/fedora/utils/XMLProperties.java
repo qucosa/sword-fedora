@@ -73,9 +73,9 @@ public class XMLProperties {
 	 */
 	public XMLProperties() {
 		SAXBuilder tBuilder = new SAXBuilder();
-		LOG.debug("Loading " + StartupServlet.getPropertiesLocation());
+		LOG.debug("Loading " + StartupListener.getPropertiesLocation());
 		try {
-			_props = tBuilder.build(new FileInputStream(StartupServlet.getPropertiesLocation()));
+			_props = tBuilder.build(new FileInputStream(StartupListener.getPropertiesLocation()));
 		} catch (IOException tIOExcpt) {
 			LOG.error("Couldn't open properties file " + tIOExcpt.toString());
 		} catch (JDOMException tJDOMExcpt) {
@@ -289,7 +289,7 @@ public class XMLProperties {
 			throw new SWORDException(tMessage, tJDOMExcpt);
 		}
 
-        return StartupServlet.realPathHelper(tEntryLoc.getText());
+        return StartupListener.realPathHelper(tEntryLoc.getText());
     }
 	/**
 	 * This returns the directory where the sub service documents are stored relative to the web app directory
@@ -344,7 +344,7 @@ public class XMLProperties {
 		SAXBuilder tBuilder = new SAXBuilder();
 		Document tChildDocs = null; 
 		try {
-            tChildDocs = tBuilder.build(StartupServlet.realPathHelper(new File(this.getSubSDDir(), pLocation).getPath()));
+            tChildDocs = tBuilder.build(StartupListener.realPathHelper(new File(this.getSubSDDir(), pLocation).getPath()));
 		} catch (IOException tIOExcpt) {
 			String tMessage = "IO Exception occured on doServiceDocument method due to a problem accessing the properties file";
 			LOG.error(tMessage);
