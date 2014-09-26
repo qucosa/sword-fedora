@@ -9,7 +9,7 @@
 
   <context-param>
     <param-name>sword-server-class</param-name>
-    <param-value>org.purl.sword.server.fedora.FedoraServer</param-value>
+    <param-value>org.purl.sword.server.fedora.CRUDFedoraServer</param-value>
     <description>
       The SWORSServer class name
     </description>
@@ -44,7 +44,7 @@
   </servlet>
   <servlet>
     <servlet-name>deposit</servlet-name>
-    <servlet-class>org.purl.sword.server.AtomDocumentServlet</servlet-class>
+    <servlet-class>org.purl.sword.server.fedora.CRUDAtomDocumentServlet</servlet-class>
   </servlet>
 
 <!-- Servlet Mappings -->
