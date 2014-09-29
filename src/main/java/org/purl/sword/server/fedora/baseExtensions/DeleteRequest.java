@@ -41,40 +41,57 @@ package org.purl.sword.server.fedora.baseExtensions;
  */
 public class DeleteRequest {
     private String username;
+    private String onBehalfOf;
+    private String password;
+    private String IPAddress;
+    private String location;
+    private boolean noOp;
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public String getIPAddress() {
-        return IPAddress;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    private String password;
-    private String IPAddress;
-    private String location;
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getIPAddress() {
+        return IPAddress;
     }
 
     public void setIPAddress(String IPAddress) {
         this.IPAddress = IPAddress;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getOnBehalfOf() {
+        return onBehalfOf;
+    }
+
+    public void setOnBehalfOf(String onBehalfOf) {
+        this.onBehalfOf = onBehalfOf;
+    }
+
+    public boolean isNoOp() {
+        return noOp;
+    }
+
+    public void setNoOp(boolean noOp) {
+        this.noOp = noOp;
     }
 }

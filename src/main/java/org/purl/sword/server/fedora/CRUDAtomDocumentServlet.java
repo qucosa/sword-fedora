@@ -37,8 +37,7 @@
 package org.purl.sword.server.fedora;
 
 import org.apache.log4j.Logger;
-import org.purl.sword.base.SWORDAuthenticationException;
-import org.purl.sword.base.SWORDException;
+import org.purl.sword.base.*;
 import org.purl.sword.server.AtomDocumentServlet;
 import org.purl.sword.server.fedora.baseExtensions.DeleteRequest;
 
@@ -57,30 +56,65 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         if (server == null) {
             log.warn("DELETE not supported: Configured SWORD server instance doesn't implement CRUD interface.");
             response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
-            return;
+        } else
+            try {
+                DeleteRequest deleteRequest = buildDeleteRequest(request);
+                server.doDelete(deleteRequest);
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            } catch (SWORDException e) {
+                log.error(e.getMessage());
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } catch (SWORDAuthenticationException e) {
+                log.error(e.getMessage());
+                // Ask for credentials again
+                String s = "Basic realm=\"SWORD\"";
+                response.setHeader("WWW-Authenticate", s);
+                response.setStatus(401);
+            } catch (SWORDErrorException e) {
+                // Get the details and send the right SWORD error document
+                log.error(e.toString());
+                this.makeErrorDocument(e.getErrorURI(),
+                        e.getStatus(),
+                        e.getDescription(),
+                        request,
+                        response);
+            }
+    }
+
+    private DeleteRequest buildDeleteRequest(HttpServletRequest request) throws SWORDAuthenticationException, SWORDErrorException {
+        DeleteRequest deleteRequest = new DeleteRequest();
+        setAuthenticationDetails(request, deleteRequest);
+        deleteRequest.setIPAddress(request.getRemoteAddr());
+        deleteRequest.setLocation(getUrl(request));
+        setOnBehalfHeader(request, deleteRequest);
+        setXNOOPHeader(request, deleteRequest);
+        return deleteRequest;
+    }
+
+    private void setXNOOPHeader(HttpServletRequest request, DeleteRequest deleteRequest) throws SWORDErrorException {
+        String noop = request.getHeader(HttpHeaders.X_NO_OP);
+        log.warn("X_NO_OP value is " + noop);
+        if ((noop != null) && (noop.equals("true"))) {
+            deleteRequest.setNoOp(true);
+        } else if ((noop != null) && (noop.equals("false"))) {
+            deleteRequest.setNoOp(false);
+        } else if (noop == null) {
+            deleteRequest.setNoOp(false);
+        } else {
+            throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
         }
-        try {
-            DeleteRequest deleteRequest = new DeleteRequest();
-            setAuthenticationDetails(request, deleteRequest);
-            deleteRequest.setIPAddress(request.getRemoteAddr());
-            deleteRequest.setLocation(getUrl(request));
-            server.doDelete(deleteRequest);
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        } catch (SWORDException e) {
-            log.error(e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (SWORDAuthenticationException e) {
-            log.error(e.getMessage());
-            // Ask for credentials again
-            String s = "Basic realm=\"SWORD\"";
-            response.setHeader("WWW-Authenticate", s);
-            response.setStatus(401);
+    }
+
+    private void setOnBehalfHeader(HttpServletRequest request, DeleteRequest deleteRequest) {
+        String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
+        if ((onBehalfOf != null) && (!onBehalfOf.isEmpty())) {
+            deleteRequest.setOnBehalfOf(onBehalfOf);
         }
     }
 
     private void setAuthenticationDetails(HttpServletRequest request, DeleteRequest deleteRequest) throws SWORDAuthenticationException {
         String usernamePassword = getUsernamePassword(request);
-        if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
+        if ((usernamePassword != null) && (!usernamePassword.isEmpty())) {
             int p = usernamePassword.indexOf(":");
             if (p != -1) {
                 deleteRequest.setUsername(usernamePassword.substring(0, p));

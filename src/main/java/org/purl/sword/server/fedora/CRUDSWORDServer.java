@@ -37,6 +37,7 @@
 package org.purl.sword.server.fedora;
 
 import org.purl.sword.base.SWORDAuthenticationException;
+import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.server.SWORDServer;
 import org.purl.sword.server.fedora.baseExtensions.DeleteRequest;
@@ -55,6 +56,6 @@ public interface CRUDSWORDServer extends SWORDServer {
      * @throws SWORDException               Thrown in an unexpected Exception occurs.
      *                                      This will be dealt with by sending a HTTP 500 Server Exception
      */
-    public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException;
+    public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException, SWORDErrorException;
 
 }
