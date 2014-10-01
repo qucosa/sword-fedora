@@ -48,15 +48,16 @@
         </dependency>
 
         <dependency>
-            <groupId>axis</groupId>
+            <groupId>org.apache.axis</groupId>
             <artifactId>axis-jaxrpc</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
             <groupId>xerces</groupId>
-            <artifactId>xmlParserAPIs</artifactId>
-            <version>2.6.2</version>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.11.0</version>
         </dependency>
 
         <dependency>
@@ -69,7 +70,7 @@
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
@@ -140,6 +141,11 @@
             <artifactId>xom</artifactId>
             <version>1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+            <version>2.7.12</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -169,6 +175,45 @@
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <useCompileClasspath>true</useCompileClasspath>
+                    <defaultOptions>
+                        <bindingFiles>
+                            <bindingFile>
+                                ${project.basedir}/src/main/resources/wsdl/bindings/JAX-WS-API-A-Bindings.xml
+                            </bindingFile>
+                            <bindingFile>
+                                ${project.basedir}/src/main/resources/wsdl/bindings/JAX-WS-API-M-Bindings.xml
+                            </bindingFile>
+                            <bindingFile>
+                                ${project.basedir}/src/main/resources/wsdl/bindings/JAX-B-Bindings.xml
+                            </bindingFile>
+                        </bindingFiles>
+                    </defaultOptions>
+                    <wsdlOptions>
+                        <wsdlOption>
+                            <wsdl>${project.basedir}/src/main/resources/wsdl/Fedora-API-A.wsdl</wsdl>
+                            <wsdlLocation>classpath:wsdl/Fedora-API-A.wsdl</wsdlLocation>
+                        </wsdlOption>
+                        <wsdlOption>
+                            <wsdl>${project.basedir}/src/main/resources/wsdl/Fedora-API-M.wsdl</wsdl>
+                            <wsdlLocation>classpath:wsdl/Fedora-API-M.wsdl</wsdlLocation>
+                        </wsdlOption>
+                    </wsdlOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
                         </goals>
                     </execution>
                 </executions>
