@@ -36,25 +36,17 @@
  */
 package org.purl.sword.server.fedora;
 
-import org.purl.sword.base.SWORDAuthenticationException;
-import org.purl.sword.base.SWORDErrorException;
-import org.purl.sword.base.SWORDException;
-import org.purl.sword.server.SWORDServer;
-import org.purl.sword.server.fedora.baseExtensions.DeleteRequest;
-
 /**
- * Extends SWORDServer interface with DELETE and UPDATE methods.
+ * Exception indicating that a particular object could not be found.
+ * <p/>
+ * According to SWORD AtomPub Profile 1.3 (http://www.swordapp.org/docs/sword-profile-1.3.html)
+ * there is no defined error document. This Exception is solely used to trigger HTTP response
+ * code 404 (NOT FOUND).
  */
-public interface CRUDSWORDServer extends SWORDServer {
+public class CRUDObjectNotFoundException extends Exception {
 
-    /**
-     * Perform a DELETE request
-     *
-     * @param deleteRequest The delete request object
-     * @throws SWORDAuthenticationException Thrown if authentication fails
-     * @throws SWORDException               Thrown in an unexpected Exception occurs.
-     *                                      This will be dealt with by sending a HTTP 500 Server Exception
-     */
-    public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException, SWORDErrorException, CRUDObjectNotFoundException;
+    public CRUDObjectNotFoundException(String description) {
+        super(description);
+    }
 
 }

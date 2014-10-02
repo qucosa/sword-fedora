@@ -59,7 +59,7 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
      *
      * @param deleteRequest The delete request object
      */
-    public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException, SWORDErrorException {
+    public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException, SWORDErrorException, CRUDObjectNotFoundException {
         authenticates(
                 deleteRequest.getUsername(),
                 deleteRequest.getPassword());
@@ -113,8 +113,7 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
                 fsq);
 
         if (fsr.getResultList().getObjectFields().isEmpty()) {
-            //TODO Generate NOT_FOUND error
-            throw new SWORDException("Object " + objectPID + " not found");
+            throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
         }
 
         ObjectFields ofs = fsr.getResultList().getObjectFields().get(0);

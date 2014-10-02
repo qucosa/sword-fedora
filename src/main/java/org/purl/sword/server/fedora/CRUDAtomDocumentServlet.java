@@ -70,6 +70,9 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
                 String s = "Basic realm=\"SWORD\"";
                 response.setHeader("WWW-Authenticate", s);
                 response.setStatus(401);
+            } catch (CRUDObjectNotFoundException e) {
+                log.debug(e.getMessage());
+                response.setStatus(404);
             } catch (SWORDErrorException e) {
                 // Get the details and send the right SWORD error document
                 log.error(e.toString());
