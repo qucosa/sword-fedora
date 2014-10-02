@@ -36,18 +36,18 @@
  */
 package org.purl.sword.server.fedora;
 
-import org.apache.axis.client.Stub;
-import org.apache.axis.types.NonNegativeInteger;
 import org.apache.log4j.Logger;
+import org.fcrepo.server.types.gen.*;
 import org.purl.sword.base.ErrorCodes;
 import org.purl.sword.base.SWORDAuthenticationException;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.SWORDException;
-import org.purl.sword.server.fedora.api.*;
 import org.purl.sword.server.fedora.baseExtensions.DeleteRequest;
 import org.purl.sword.server.fedora.baseExtensions.ServiceDocumentQueries;
 
-import java.rmi.RemoteException;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import java.math.BigInteger;
 
 public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
 
@@ -75,7 +75,7 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
         final String collectionPID = tWords[tWords.length - 2];
         final String objectPID = tWords[tWords.length - 1];
 
-        ServiceDocumentQueries serviceDocument = (ServiceDocumentQueries)this.getServiceDocument(onBehalfOf);
+        ServiceDocumentQueries serviceDocument = (ServiceDocumentQueries) this.getServiceDocument(onBehalfOf);
         // Check to see if user is allowed to deposit in collection
         // and is therefore allowed to delete
         if (!serviceDocument.isAllowedToDeposit(onBehalfOf, collectionPID)) {
@@ -91,36 +91,38 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
 
         // Modify the object's state to Deleted,
         // but leave other properties unchanged
-        try {
-            // TODO This call will fail due to Axis bug
-            FieldSearchQuery fsq = new FieldSearchQuery();
-            fsq.setConditions(new Condition[]{
-                    new Condition("pid", ComparisonOperator.eq, objectPID)});
-            FieldSearchResult fsr = _APIA.findObjects(
-                    new String[]{"ownerId", "label"},
-                    new NonNegativeInteger("1"),
-                    fsq);
+        FieldSearchQuery fsq = new FieldSearchQuery();
+        fsq.setConditions(new JAXBElement<FieldSearchQuery.Conditions>(
+                new QName("conditions"),
+                FieldSearchQuery.Conditions.class,
+                new FieldSearchQuery.Conditions() {{
+                    getCondition().add(new Condition() {{
+                        setProperty("pid");
+                        setOperator(ComparisonOperator.EQ);
+                        setValue(objectPID);
+                    }});
+                }}
+        ));
+        FieldSearchResult fsr = _APIA.findObjects(
+                new ArrayOfString() {{
+                    getItem().add("pid");
+                    getItem().add("ownerId");
+                    getItem().add("label");
+                }},
+                BigInteger.ONE,
+                fsq);
 
-            if (fsr.getResultList().length != 1) {
-                //TODO Generate NOT_FOUND error
-                throw new SWORDException("Object " + objectPID + " not found");
-            }
-
-            ObjectFields ofs = fsr.getResultList()[1];
-            String label = ofs.getLabel();
-            String ownerId = ofs.getOwnerId();
-
-            _APIM.modifyObject(objectPID, "D", label, ownerId, "Deleted on behalf of " + onBehalfOf);
-            log.debug("Set object state to deleted: " + objectPID);
-        } catch (RemoteException e) {
-            throw new SWORDException(e.getMessage());
+        if (fsr.getResultList().getObjectFields().isEmpty()) {
+            //TODO Generate NOT_FOUND error
+            throw new SWORDException("Object " + objectPID + " not found");
         }
+
+        ObjectFields ofs = fsr.getResultList().getObjectFields().get(0);
+        String label = ofs.getLabel().getValue();
+        String ownerId = ofs.getOwnerId().getValue();
+
+        _APIM.modifyObject(objectPID, "D", label, ownerId, "Deleted on behalf of " + onBehalfOf);
+        log.debug("Set object state to deleted: " + objectPID);
     }
 
-    @Override
-    public void authenticates(String pUsername, String pPassword) throws SWORDAuthenticationException, SWORDException {
-        super.authenticates(pUsername, pPassword);
-        ((Stub)_APIM).setUsername(pUsername);
-        ((Stub)_APIM).setPassword(pPassword);
-    }
 }

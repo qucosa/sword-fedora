@@ -1,7 +1,8 @@
 <jaxws:bindings wsdlLocation="../Fedora-API-A.wsdl"
-	xmlns:jaxws="http://java.sun.com/xml/ns/jaxws" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-	<jaxws:bindings node="wsdl:definitions">
-		<jaxws:package name="org.fcrepo.server.access" />
-	</jaxws:bindings>
+                xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+                xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                version="1.0">
+    <jaxws:bindings node="wsdl:definitions">
+        <jaxws:package name="org.fcrepo.server.access"/>
+    </jaxws:bindings>
 </jaxws:bindings>
