@@ -36,8 +36,6 @@
  */
 package org.purl.sword.server.fedora;
 
-import nu.xom.Document;
-import nu.xom.Serializer;
 import org.apache.log4j.Logger;
 import org.fcrepo.server.types.gen.*;
 import org.purl.sword.base.ErrorCodes;
@@ -50,8 +48,6 @@ import org.purl.sword.server.fedora.baseExtensions.ServiceDocumentQueries;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 
 public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
@@ -134,7 +130,7 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
     private void safeDeleteCachedResponse(String collectionPID, String objectPID) {
         try {
             File collectionDir = new File(_props.getEntryStoreLocation(), collectionPID.replaceAll(":", "_"));
-            File responseFile = new File(collectionDir,objectPID.replaceAll(":", "_") + ".xml");
+            File responseFile = new File(collectionDir, objectPID.replaceAll(":", "_") + ".xml");
             if (responseFile.exists()) {
                 responseFile.delete();
             }

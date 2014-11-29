@@ -84,6 +84,10 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
             }
     }
 
+    private CRUDSWORDServer obtainCRUDServerInstanceOrNull() {
+        return myRepository instanceof CRUDSWORDServer ? (CRUDSWORDServer) myRepository : null;
+    }
+
     private DeleteRequest buildDeleteRequest(HttpServletRequest request) throws SWORDAuthenticationException, SWORDErrorException {
         DeleteRequest deleteRequest = new DeleteRequest();
         setAuthenticationDetails(request, deleteRequest);
@@ -92,27 +96,6 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         setOnBehalfHeader(request, deleteRequest);
         setXNOOPHeader(request, deleteRequest);
         return deleteRequest;
-    }
-
-    private void setXNOOPHeader(HttpServletRequest request, DeleteRequest deleteRequest) throws SWORDErrorException {
-        String noop = request.getHeader(HttpHeaders.X_NO_OP);
-        log.warn("X_NO_OP value is " + noop);
-        if ((noop != null) && (noop.equals("true"))) {
-            deleteRequest.setNoOp(true);
-        } else if ((noop != null) && (noop.equals("false"))) {
-            deleteRequest.setNoOp(false);
-        } else if (noop == null) {
-            deleteRequest.setNoOp(false);
-        } else {
-            throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
-        }
-    }
-
-    private void setOnBehalfHeader(HttpServletRequest request, DeleteRequest deleteRequest) {
-        String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
-        if ((onBehalfOf != null) && (!onBehalfOf.isEmpty())) {
-            deleteRequest.setOnBehalfOf(onBehalfOf);
-        }
     }
 
     private void setAuthenticationDetails(HttpServletRequest request, DeleteRequest deleteRequest) throws SWORDAuthenticationException {
@@ -128,7 +111,24 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         }
     }
 
-    private CRUDSWORDServer obtainCRUDServerInstanceOrNull() {
-        return myRepository instanceof CRUDSWORDServer ? (CRUDSWORDServer) myRepository : null;
+    private void setOnBehalfHeader(HttpServletRequest request, DeleteRequest deleteRequest) {
+        String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
+        if ((onBehalfOf != null) && (!onBehalfOf.isEmpty())) {
+            deleteRequest.setOnBehalfOf(onBehalfOf);
+        }
+    }
+
+    private void setXNOOPHeader(HttpServletRequest request, DeleteRequest deleteRequest) throws SWORDErrorException {
+        String noop = request.getHeader(HttpHeaders.X_NO_OP);
+        log.warn("X_NO_OP value is " + noop);
+        if ((noop != null) && (noop.equals("true"))) {
+            deleteRequest.setNoOp(true);
+        } else if ((noop != null) && (noop.equals("false"))) {
+            deleteRequest.setNoOp(false);
+        } else if (noop == null) {
+            deleteRequest.setNoOp(false);
+        } else {
+            throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
+        }
     }
 }

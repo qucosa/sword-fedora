@@ -55,6 +55,11 @@ public interface CRUDSWORDServer extends SWORDServer {
      * @throws SWORDException               Thrown in an unexpected Exception occurs.
      *                                      This will be dealt with by sending a HTTP 500 Server Exception
      */
-    public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException, SWORDErrorException, CRUDObjectNotFoundException;
+    public void doDelete(DeleteRequest deleteRequest)
+            throws
+            SWORDAuthenticationException,
+            SWORDException,
+            SWORDErrorException,
+            CRUDObjectNotFoundException;
 
 }
