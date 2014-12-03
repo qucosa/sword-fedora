@@ -128,6 +128,25 @@ public class StartupListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
     }
 
+    private void initLog4j() {
+        String logConfigPath = getAbsolutePathToResource(
+                orDefaultIfNull(getFirstValid(
+                                System.getProperty("log4j.configuration"),
+                                context.getInitParameter("log-config")),
+                        "WEB-INF/log4j.xml"));
+        log.info("Taking log4j config from: " + logConfigPath);
+        configure(logConfigPath);
+    }
+
+    private void initPropertiesLocation() {
+        propertiesLocation = getAbsolutePathToResource(
+                orDefaultIfNull(getFirstValid(
+                                System.getProperty("project.properties"),
+                                context.getInitParameter("project.properties")),
+                        "WEB-INF/properties.xml"));
+        log.info("Loading properties files from: " + propertiesLocation);
+    }
+
     private String getAbsolutePathToResource(String resourcePath) {
         if (resourcePath.startsWith("/")) {
             File file = new File(resourcePath);
@@ -138,20 +157,12 @@ public class StartupListener implements ServletContextListener {
         }
     }
 
-    private void initLog4j() {
-        String logConfigPath = getAbsolutePathToResource(
-                orDefaultIfNull(context.getInitParameter("log-config"), "WEB-INF/log4j.xml"));
-        log.info("Taking log4j config from: " + logConfigPath);
-        configure(logConfigPath);
-    }
-
-    private void initPropertiesLocation() {
-        propertiesLocation = getAbsolutePathToResource(
-                orDefaultIfNull(context.getInitParameter("project.properties"), "WEB-INF/properties.xml"));
-        log.info("Loading properties files from: " + propertiesLocation);
-    }
-
     private String orDefaultIfNull(String s, String defaultValue) {
         return (s == null) ? defaultValue : s;
+    }
+
+    private String getFirstValid(String... values) {
+        for (String s : values) if (s != null) return s;
+        return null;
     }
 }
