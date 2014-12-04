@@ -42,7 +42,6 @@ import org.purl.sword.base.SWORDException;
 import org.purl.sword.server.fedora.utils.XMLProperties;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -59,25 +58,24 @@ public class FileHandlerFactory {
 
     private static final Logger LOG = Logger.getLogger(FileHandlerFactory.class);
     private static FileHandlerFactory instance;
-    private final List<FileHandler> fileHandlers;
+    private final List<Class<FileHandler>> fileHandlers;
 
     private FileHandlerFactory(XMLProperties xmlProperties) {
         this.fileHandlers = loadFileHandlers(xmlProperties);
     }
 
-    private List<FileHandler> loadFileHandlers(XMLProperties tProps) {
-        List<FileHandler> tHandlers = new ArrayList<FileHandler>();
+    private List<Class<FileHandler>> loadFileHandlers(XMLProperties tProps) {
+        List<Class<FileHandler>> tHandlers = new ArrayList<Class<FileHandler>>();
         try {
             for (String tClassName : tProps.getFileHandlerClasses()) {
                 LOG.debug("Loading " + tClassName + " as a file handler");
                 try {
-                    tHandlers.add((FileHandler) Class.forName(tClassName).newInstance());
+                    Class c = Class.forName(tClassName);
+                    if (FileHandler.class.isAssignableFrom(c)) {
+                        tHandlers.add(c);
+                    }
                 } catch (ClassNotFoundException tClassExcpt) {
                     LOG.warn("Couldn't find class " + tClassName + " in CLASSPATH");
-                } catch (InstantiationException tInstExcpt) {
-                    LOG.error("Couldn't instantiate " + tClassName + " ensure it has a default constructor and implements FileHandler interface");
-                } catch (IllegalAccessException tIllegalAccess) {
-                    LOG.error("Couldn't instantiate " + tClassName + " ensure it has a default constructor and implements FileHandler interface");
                 }
             }
         } catch (SWORDException e) {
@@ -101,14 +99,15 @@ public class FileHandlerFactory {
      */
     public FileHandler getFileHandler(final String pContentType, final String pPackaging) throws SWORDException {
         LOG.debug("Looking for " + pContentType + " and packaging " + pPackaging);
-
-        Iterator<FileHandler> tHandlerIter = fileHandlers.iterator();
-        FileHandler tHandler;
-        while (tHandlerIter.hasNext()) {
-            tHandler = tHandlerIter.next();
-            if (tHandler.isHandled(pContentType, pPackaging)) {
-                LOG.debug("Found handler " + tHandler.getClass().getName());
-                return tHandler;
+        for (Class<FileHandler> fileHandlerClass : fileHandlers) {
+            try {
+                FileHandler fileHandler = fileHandlerClass.newInstance();
+                if (fileHandler.isHandled(pContentType, pPackaging)) {
+                    LOG.debug("Found handler " + fileHandlerClass.getClass().getName());
+                    return fileHandler;
+                }
+            } catch (ReflectiveOperationException e) {
+                LOG.error("Couldn't instantiate " + fileHandlerClass.getCanonicalName() + " ensure it has a default constructor and implements FileHandler interface");
             }
         }
 
