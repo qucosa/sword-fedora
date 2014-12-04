@@ -75,7 +75,11 @@ public class XMLCollection extends Collection {
 		super.setTreatment(pCollectionEl.getChild("treatment").getText());
 
 		for (Element tAcceptsPackageEl : (List<Element>)pCollectionEl.getChild("packaging").getChildren()) {
-			super.addAcceptPackaging(tAcceptsPackageEl.getText(), Float.parseFloat(tAcceptsPackageEl.getAttributeValue("quality")));
+            String attributeValue = tAcceptsPackageEl.getAttributeValue("quality");
+            if (attributeValue == null) {
+                attributeValue = "1.0";
+            }
+            super.addAcceptPackaging(tAcceptsPackageEl.getText(), Float.parseFloat(attributeValue));
 		}
 
 		super.setAbstract(pCollectionEl.getChild("abstract").getText());
