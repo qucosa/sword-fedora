@@ -77,10 +77,14 @@ public class FedoraServer implements SWORDServer {
     protected FedoraAPIM _APIM = null;
     protected FedoraAPIA _APIA = null;
     protected XMLProperties _props = null;
+    private FileHandlerFactory fileHandlerFactory;
 
     public FedoraServer() {
         _props = new XMLProperties();
         try {
+            {
+                fileHandlerFactory = FileHandlerFactory.getInstance(_props);
+            }
             {
                 JaxWsProxyFactoryBean factoryBean = new JaxWsProxyFactoryBean();
                 factoryBean.setServiceClass(FedoraAPIA.class);
@@ -200,7 +204,7 @@ public class FedoraServer implements SWORDServer {
             }
 
             // Call the file handlers and see which one responds that it can handle the deposit
-            FileHandler tHandler = FileHandlerFactory.getFileHandler(pDeposit.getContentType(), pDeposit.getPackaging());
+            FileHandler tHandler = fileHandlerFactory.getFileHandler(pDeposit.getContentType(), pDeposit.getPackaging());
             SWORDEntry tEntry = tHandler.ingestDeposit(new DepositCollection(pDeposit, tCollectionPID), (ServiceDocument) tServiceDoc);
 
             // send response
