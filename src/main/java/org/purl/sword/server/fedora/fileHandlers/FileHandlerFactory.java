@@ -1,6 +1,4 @@
-package org.purl.sword.server.fedora.fileHandlers;
-
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -36,15 +34,8 @@ package org.purl.sword.server.fedora.fileHandlers;
   * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
   * SUCH DAMAGE.
   *
-  * @author Glen Robson
-  * @version 1.0
-  * Date: 18 October 2007 
-  *
-  * This class reads in the file handlers from the config file and decides which 
-  * one can handle the request. The first one it comes across that says it can
-  * handle the requested is returned. If none are matched a DefaultFileHandler is 
-  * used.
   */
+package org.purl.sword.server.fedora.fileHandlers;
 
 import org.apache.log4j.Logger;
 import org.purl.sword.base.SWORDException;
@@ -54,63 +45,74 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This class reads in the file handlers from the config file and decides which
+ * one can handle the request. The first one it comes across that says it can
+ * handle the requested is returned. If none are matched a DefaultFileHandler is
+ * used.
+ *
+ * @author Glen Robson
+ * @version 1.0
+ * @since 18 October 2007
+ */
 public class FileHandlerFactory {
-	private static final Logger LOG = Logger.getLogger(FileHandlerFactory.class);
-	/**
-	 * Find the file handler which can handle the mime type and packaging
-	 *
-	 * @param String the mime type of the deposit
-	 * @param String the packaging
-	 * @return FileHandler the file handler which can handle the deposit
-	 * @throws SWORDException if there was a problem reading the config file or a file handler couldn't be created
-	 */
-	public static FileHandler getFileHandler(final String pContentType, final String pPackaging) throws SWORDException {
-		LOG.debug("Looking for " + pContentType + " and packaging " + pPackaging);
+    private static final Logger LOG = Logger.getLogger(FileHandlerFactory.class);
 
-		Iterator<FileHandler> tHandlerIter = FileHandlerFactory.getFileHandlers().iterator();
-		FileHandler tHandler = null;
-		while (tHandlerIter.hasNext()) {
-			tHandler = tHandlerIter.next();
+    /**
+     * Find the file handler which can handle the mime type and packaging
+     *
+     * @param pContentType The mime type of the deposit
+     * @param pPackaging   The packaging
+     * @return The file handler which can handle the deposit
+     * @throws SWORDException if there was a problem reading the config file or a file handler couldn't be created
+     */
+    public static FileHandler getFileHandler(final String pContentType, final String pPackaging) throws SWORDException {
+        LOG.debug("Looking for " + pContentType + " and packaging " + pPackaging);
 
-			if (tHandler.isHandled(pContentType, pPackaging)) {
-				LOG.debug("Found handler " + tHandler.getClass().getName());
-				return tHandler;
-			}
-		}
+        Iterator<FileHandler> tHandlerIter = FileHandlerFactory.getFileHandlers().iterator();
+        FileHandler tHandler;
+        while (tHandlerIter.hasNext()) {
+            tHandler = tHandlerIter.next();
 
-		// Nothing found so return default handler
-		LOG.debug("Couldn't find a file handler so using default");
-		return new DefaultFileHandler(pContentType, pPackaging);
-	}
+            if (tHandler.isHandled(pContentType, pPackaging)) {
+                LOG.debug("Found handler " + tHandler.getClass().getName());
+                return tHandler;
+            }
+        }
 
-	private static List<FileHandler> getFileHandlers() throws SWORDException {
-		List<FileHandler> tHandlers = new ArrayList<FileHandler>();
+        // Nothing found so return default handler
+        LOG.debug("Couldn't find a file handler so using default");
+        return new DefaultFileHandler(pContentType, pPackaging);
+    }
 
-		XMLProperties tProps = new XMLProperties();
-		Iterator<String> tHandlerClassIter = tProps.getFileHandlerClasses().iterator();
-		String tClassName = "";
-		while (tHandlerClassIter.hasNext()) {
-			tClassName = tHandlerClassIter.next();
-			
-			LOG.debug("Loading " + tClassName + " as a file handler");
-			
-			try {
-				tHandlers.add((FileHandler)Class.forName(tClassName).newInstance());
-			} catch (ClassNotFoundException tClassExcpt) {
-				String tMessage = "Couldn't find class " + tClassName + " in CLASSPATH";
-				LOG.error(tMessage);
-				throw new SWORDException(tMessage, tClassExcpt);
-			} catch (InstantiationException tInstExcpt) {	
-				String tMessage = "Couldn't instanciate " + tClassName + " ensure it has a default constructor and implements FileHandler interface";
-				LOG.error(tMessage);
-				throw new SWORDException(tMessage, tInstExcpt);
-			} catch (IllegalAccessException tIllegalAccess) {
-				String tMessage = "Couldn't instanciate " + tClassName + " ensure it has a default constructor and implements FileHandler interface";
-				LOG.error(tMessage);
-				throw new SWORDException(tMessage, tIllegalAccess);
-			}
-		}
+    private static List<FileHandler> getFileHandlers() throws SWORDException {
+        List<FileHandler> tHandlers = new ArrayList<FileHandler>();
 
-		return tHandlers;
-	}
+        XMLProperties tProps = new XMLProperties();
+        Iterator<String> tHandlerClassIter = tProps.getFileHandlerClasses().iterator();
+        String tClassName;
+        while (tHandlerClassIter.hasNext()) {
+            tClassName = tHandlerClassIter.next();
+
+            LOG.debug("Loading " + tClassName + " as a file handler");
+
+            try {
+                tHandlers.add((FileHandler) Class.forName(tClassName).newInstance());
+            } catch (ClassNotFoundException tClassExcpt) {
+                String tMessage = "Couldn't find class " + tClassName + " in CLASSPATH";
+                LOG.error(tMessage);
+                throw new SWORDException(tMessage, tClassExcpt);
+            } catch (InstantiationException tInstExcpt) {
+                String tMessage = "Couldn't instantiate " + tClassName + " ensure it has a default constructor and implements FileHandler interface";
+                LOG.error(tMessage);
+                throw new SWORDException(tMessage, tInstExcpt);
+            } catch (IllegalAccessException tIllegalAccess) {
+                String tMessage = "Couldn't instantiate " + tClassName + " ensure it has a default constructor and implements FileHandler interface";
+                LOG.error(tMessage);
+                throw new SWORDException(tMessage, tIllegalAccess);
+            }
+        }
+
+        return tHandlers;
+    }
 }

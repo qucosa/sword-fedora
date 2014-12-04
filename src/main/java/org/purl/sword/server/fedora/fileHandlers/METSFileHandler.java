@@ -1,6 +1,4 @@
-package org.purl.sword.server.fedora.fileHandlers;
-
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -36,12 +34,8 @@ package org.purl.sword.server.fedora.fileHandlers;
   * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
   * SUCH DAMAGE.
   *
-  * @author Glen Robson
-  * @version 1.0
-  * Date: 26th February 2009
-  *
-  * This class ingests mets documents.
   */
+package org.purl.sword.server.fedora.fileHandlers;
 
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
@@ -58,108 +52,106 @@ import org.purl.sword.server.fedora.utils.METSObject;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * This class ingests METS documents.
+ *
+ * @author Glen Robson
+ * @version 1.0
+ * @since 26th February 2009
+ */
 public class METSFileHandler extends DefaultFileHandler implements FileHandler {
-	private static final Logger LOG = Logger.getLogger(METSFileHandler.class);
+    private static final Logger LOG = Logger.getLogger(METSFileHandler.class);
 
-	protected METSObject _mets = null;
-	
-	public METSFileHandler() {
-		super("text/xml", "http://www.loc.gov/METS/");
-	}
-	
-	/**
-	 * This file handler can handle mime types text/xml with packaging of mets defined by the sword-types specification
-	 *
-	 * @param String the mime type
-	 * @param String packaging (should be http://www.loc.gov/METS/)
-	 * @return boolean if this handler can handle the current deposit
-	 */
-	public boolean isHandled(final String pMimeType, final String pPackaging) {
-		return pMimeType.equals("text/xml") && pPackaging != null && pPackaging.equalsIgnoreCase("http://www.loc.gov/METS/");
-	}
+    protected METSObject _mets = null;
 
-	/**
-	 * The METS document needs to be proccessed at the start of the ingest process so we do it hear
-	 * then call the super.ingestDeposit to handle the actual deposit
-	 * 
-	 * @param DepositCollection the deposit and its associated collection
-	 * @param ServiceDocument the service document which this request applies to
-	 * @throws SWORDException if any problems occured during ingest
-	 */
-	public SWORDEntry ingestDepost(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException {
-		try {
-			SAXBuilder tBuilder = new SAXBuilder();
-			_mets = new METSObject(tBuilder.build(pDeposit.getFile()));
-		} catch (IOException tIOExcpt) {
-			String tMessage = "Couldn't retrieve METS from deposit: " + tIOExcpt.toString();
-			LOG.error(tMessage);
-			tIOExcpt.printStackTrace();
-			throw new SWORDException(tMessage, tIOExcpt);
-		} catch (JDOMException tJDOMExcpt) {
-			String tMessage = "Couldn't build METS from deposit: " + tJDOMExcpt.toString();
-			LOG.error(tMessage);
-			tJDOMExcpt.printStackTrace();
-			throw new SWORDException(tMessage, tJDOMExcpt);
-		}
+    public METSFileHandler() {
+        super("text/xml", "http://www.loc.gov/METS/");
+    }
 
-		return super.ingestDepost(pDeposit, pServiceDocument);
-	}
+    /**
+     * The METS document needs to be processed at the start of the ingest process so we do it hear
+     * then call the super.ingestDeposit to handle the actual deposit
+     *
+     * @param pDeposit         The deposit and its associated collection
+     * @param pServiceDocument The service document which this request applies to
+     * @throws SWORDException if any problem occurred during ingest
+     */
+    public SWORDEntry ingestDeposit(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException {
+        try {
+            SAXBuilder tBuilder = new SAXBuilder();
+            _mets = new METSObject(tBuilder.build(pDeposit.getFile()));
+        } catch (IOException tIOExcpt) {
+            String tMessage = "Couldn't retrieve METS from deposit: " + tIOExcpt.toString();
+            LOG.error(tMessage);
+            tIOExcpt.printStackTrace();
+            throw new SWORDException(tMessage, tIOExcpt);
+        } catch (JDOMException tJDOMExcpt) {
+            String tMessage = "Couldn't build METS from deposit: " + tJDOMExcpt.toString();
+            LOG.error(tMessage);
+            tJDOMExcpt.printStackTrace();
+            throw new SWORDException(tMessage, tJDOMExcpt);
+        }
 
-	/**
-	 * Retrieve the dublin core from the METS document if possible, if not use the super class. DefaultFileHandler
-	 * @param DepositCollection the deposit
-	 * @return DublinCore the Dublin Core datastream
-	 */
-	protected DublinCore getDublinCore(final DepositCollection pDeposit) {
-		DublinCore tDC = _mets.getDublinCore();
+        return super.ingestDeposit(pDeposit, pServiceDocument);
+    }
 
-		if (tDC == null) {
-			return super.getDublinCore(pDeposit);
-		} else {
-			return tDC;
-		}
-	} 
+    /**
+     * Retrieve the dublin core from the METS document if possible, if not use the super class. DefaultFileHandler
+     *
+     * @param pDeposit The deposit
+     * @return The Dublin Core datastream
+     */
+    protected DublinCore getDublinCore(final DepositCollection pDeposit) {
+        DublinCore tDC = _mets.getDublinCore();
 
-	/**
-	 * Retrieve the Relationships from the METS document if possible, if not use the super class. DefaultFileHandler
-	 * @param DepositCollection the deposit
-	 * @return Relationships the RELS-EXT datastream
-	 */
-	protected Relationship getRelationships(final DepositCollection pDeposit) {
-		Relationship tRelations = _mets.getRelationships();
+        if (tDC == null) {
+            return super.getDublinCore(pDeposit);
+        } else {
+            return tDC;
+        }
+    }
 
-		if (tRelations == null) {
-			return super.getRelationships(pDeposit);
-		} else {
-			return tRelations;
-		}
-	}
+    /**
+     * Retrieve the Relationships from the METS document if possible, if not use the super class. DefaultFileHandler
+     *
+     * @param pDeposit The deposit
+     * @return The RELS-EXT datastream
+     */
+    protected Relationship getRelationships(final DepositCollection pDeposit) {
+        Relationship tRelations = _mets.getRelationships();
 
-	/** 
-	 * Get the datastreams out of the METS
-	 * 
-	 * @param DepositCollection the deposit
-	 * @return List<Datastream> a list of the datastreams
-	 * @throws SWORDException if there was a problem processing the METS
-	 */
-	protected List<Datastream> getDatastreams(final DepositCollection pDeposit) throws SWORDException {
-		try {
-			return _mets.getDatastreams();
-		} catch (JDOMException tJDOMExcpt) {
-			String tMessage = "Couldn't retrieve datastreams from METS: " + tJDOMExcpt.toString();
-			LOG.error(tMessage);
-			tJDOMExcpt.printStackTrace();
-			throw new SWORDException(tMessage, tJDOMExcpt);
-		}
-	}	
+        if (tRelations == null) {
+            return super.getRelationships(pDeposit);
+        } else {
+            return tRelations;
+        }
+    }
 
-	/**
-	 * Change the name of the uploaded file link to point to the METS datastream
-	 *
-	 * @param DepositCollection the deposit
-	 * @return String the name of the METS datastream
-	 */
-	protected String getLinkName(final DepositCollection pDeposit) {
-		return "METS";
-	}	
+    /**
+     * Get the datastreams out of the METS
+     *
+     * @param pDeposit The deposit
+     * @return A list of the datastreams
+     * @throws SWORDException if there was a problem processing the METS
+     */
+    protected List<Datastream> getDatastreams(final DepositCollection pDeposit) throws SWORDException {
+        try {
+            return _mets.getDatastreams();
+        } catch (JDOMException tJDOMExcpt) {
+            String tMessage = "Couldn't retrieve datastreams from METS: " + tJDOMExcpt.toString();
+            LOG.error(tMessage);
+            tJDOMExcpt.printStackTrace();
+            throw new SWORDException(tMessage, tJDOMExcpt);
+        }
+    }
+
+    /**
+     * Change the name of the uploaded file link to point to the METS datastream
+     *
+     * @param pDeposit The deposit
+     * @return String the name of the METS datastream
+     */
+    protected String getLinkName(final DepositCollection pDeposit) {
+        return "METS";
+    }
 }

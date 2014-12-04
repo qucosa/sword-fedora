@@ -1,6 +1,4 @@
-package org.purl.sword.server.fedora.fileHandlers;
-
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -36,35 +34,38 @@ package org.purl.sword.server.fedora.fileHandlers;
   * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
   * SUCH DAMAGE.
   *
-  * @author Glen Robson
-  * @version 1.0
-  * Date: 18 October 2007 
-  *
-  * All file handlers must implement this interface and must have a default 
-  * constructor which takes no parameters and throws no exceptions.
   */
+package org.purl.sword.server.fedora.fileHandlers;
 
 import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 
+/**
+ * All file handlers must implement this interface and must have a default
+ * constructor which takes no parameters and throws no exceptions.
+ *
+ * @author Glen Robson
+ * @version 1.0
+ * @since 18 October 2007
+ */
 public interface FileHandler {
-	/**
-	 * This decides whether the File handler can handle the current deposit. 
-	 *
-	 * @param String the mime type
-	 * @param String packaging
-	 * @return boolean if this handler can handle the current deposit
-	 */
-	public boolean isHandled(final String pMimeType, final String pPackaging);
+    /**
+     * This decides whether the File handler can handle the current deposit.
+     *
+     * @param pMimeType  The mime type
+     * @param pPackaging The packaging
+     * @return True, if this handler can handle the current deposit
+     */
+    public boolean isHandled(final String pMimeType, final String pPackaging);
 
-	/**
-	 * Take the deposit and ingest it into Fedora
-	 * 
-	 * @param DepositCollection the deposit and its associated collection
-	 * @param ServiceDocument the service document which this request applies to
-	 * @throws SWORDException if any problems occured during ingest
-	 */
-	public SWORDEntry ingestDepost(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException;
+    /**
+     * Take the deposit and ingest it into Fedora
+     *
+     * @param pDeposit         The deposit and its associated collection
+     * @param pServiceDocument The service document which this request applies to
+     * @throws SWORDException if any problem occurred during ingest
+     */
+    public SWORDEntry ingestDeposit(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException;
 }

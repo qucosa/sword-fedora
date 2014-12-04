@@ -1,6 +1,4 @@
-package org.purl.sword.server.fedora.fileHandlers;
-
-/**
+/*
   * Copyright (c) 2007, Aberystwyth University
   *
   * All rights reserved.
@@ -36,13 +34,8 @@ package org.purl.sword.server.fedora.fileHandlers;
   * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
   * SUCH DAMAGE.
   *
-  * @author Glen Robson
-  * @version 1.0
-  * Date: 26th February 2009
-  *
-  * This class handles Zip file deposits.
-  *
   */
+package org.purl.sword.server.fedora.fileHandlers;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -59,64 +52,60 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class handles Zip file deposits.
+ *
+ * @author Glen Robson
+ * @version 1.0
+ * @since 26th February 2009
+ */
 public class ZipFileHandler extends DefaultFileHandler implements FileHandler {
-	private static final Logger LOG = Logger.getLogger(ZipFileHandler.class);
+    private static final Logger LOG = Logger.getLogger(ZipFileHandler.class);
 
-	protected ZipFileAccess _zipFile = null;
+    protected ZipFileAccess _zipFile = null;
 
-	public ZipFileHandler() {
-		super("application/zip", "");
-	}
-	
-	/**
-	 * This file handler accepts files with a mime type application/zip and a packaging which is null or empty
-	 *
-	 * @param String the mime type
-	 * @param String packaging
-	 * @return boolean if this handler can handle the current deposit
-	 */
-	public boolean isHandled(final String pMimeType, final String pPackaging) {
-		return pMimeType.equals("application/zip") && (pPackaging == null || pPackaging.trim().length() == 0);
-	}
+    public ZipFileHandler() {
+        super("application/zip", "");
+    }
 
-	/**
-	 *	To ensure the temp directories are deleted after ingest this method is overridden to remove
-	 * the temp dirs but it calls the super.ingestDepost first
-	 * 
-	 * @param DepositCollection the deposit and its associated collection
-	 * @param ServiceDocument the service document which this request applies to
-	 * @throws SWORDException if any problems occured during ingest
-	 */
-	public SWORDEntry ingestDepost(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException {
-		_zipFile = new ZipFileAccess(super.getTempDir());
-		SWORDEntry tEntry = super.ingestDepost(pDeposit, pServiceDocument);
-		LOG.debug("Cleaning up local zip files in " + super.getTempDir() + "zip-extract");
-		// ensure the directories are deleted
-		_zipFile.removeLocalFiles();
+    /**
+     * To ensure the temp directories are deleted after ingest this method is overridden to remove
+     * the temp dirs but it calls the super.ingestDeposit first
+     *
+     * @param pDeposit         The deposit and its associated collection
+     * @param pServiceDocument The service document which this request applies to
+     * @throws SWORDException if any problem occurred during ingest
+     */
+    public SWORDEntry ingestDeposit(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException {
+        _zipFile = new ZipFileAccess(super.getTempDir());
+        SWORDEntry tEntry = super.ingestDeposit(pDeposit, pServiceDocument);
+        LOG.debug("Cleaning up local zip files in " + super.getTempDir() + "zip-extract");
+        // ensure the directories are deleted
+        _zipFile.removeLocalFiles();
 
-		return tEntry;
-	}
+        return tEntry;
+    }
 
-	/** 
-	 * This returns a list of datastreams that were contained in the Zip file
-	 *
-	 * @param DepositCollection the deposit
-	 * @return List<Datastream> a list of the datastreams
-	 * @throws IOException if there was a problem extracting the archive or accessing the files
-	 * @throws SWORDException if there were any other problems
-	 */
-	protected List<Datastream> getDatastreams(final DepositCollection pDeposit) throws IOException, SWORDException {
-		List<Datastream> tDatastreams = new ArrayList<Datastream>();
-		LOG.debug("copying file");
-		
-		String tZipTempFileName = super.getTempDir() + "uploaded-file.tmp";
-		IOUtils.copy(pDeposit.getFile(), new FileOutputStream(tZipTempFileName));
-		// Add the original zip file
-		Datastream tDatastream = new LocalDatastream(super.getGenericFileName(pDeposit), this.getContentType(), tZipTempFileName);
-		tDatastreams.add(tDatastream);
-	
-		tDatastreams.addAll(_zipFile.getFiles(tZipTempFileName));
+    /**
+     * This returns a list of datastreams that were contained in the Zip file
+     *
+     * @param pDeposit The deposit
+     * @return A list of datastreams
+     * @throws IOException    if there was a problem extracting the archive or accessing the files
+     * @throws SWORDException if there were any other problems
+     */
+    protected List<Datastream> getDatastreams(final DepositCollection pDeposit) throws IOException, SWORDException {
+        List<Datastream> tDatastreams = new ArrayList<Datastream>();
+        LOG.debug("copying file");
 
-		return tDatastreams;
-	}	
+        String tZipTempFileName = super.getTempDir() + "uploaded-file.tmp";
+        IOUtils.copy(pDeposit.getFile(), new FileOutputStream(tZipTempFileName));
+        // Add the original zip file
+        Datastream tDatastream = new LocalDatastream(super.getGenericFileName(pDeposit), this.getContentType(), tZipTempFileName);
+        tDatastreams.add(tDatastream);
+
+        tDatastreams.addAll(_zipFile.getFiles(tZipTempFileName));
+
+        return tDatastreams;
+    }
 }

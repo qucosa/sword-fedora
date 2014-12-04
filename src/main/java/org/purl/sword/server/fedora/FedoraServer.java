@@ -201,7 +201,7 @@ public class FedoraServer implements SWORDServer {
 
             // Call the file handlers and see which one responds that it can handle the deposit
             FileHandler tHandler = FileHandlerFactory.getFileHandler(pDeposit.getContentType(), pDeposit.getPackaging());
-            SWORDEntry tEntry = tHandler.ingestDepost(new DepositCollection(pDeposit, tCollectionPID), (ServiceDocument) tServiceDoc);
+            SWORDEntry tEntry = tHandler.ingestDeposit(new DepositCollection(pDeposit, tCollectionPID), (ServiceDocument) tServiceDoc);
 
             // send response
             DepositResponse tResponse = new DepositResponse(Deposit.CREATED);
