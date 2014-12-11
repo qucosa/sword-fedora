@@ -96,13 +96,16 @@ public class DefaultFileHandler implements FileHandler {
      * This decides whether the File handler can handle the current deposit.
      *
      * @param pContentType Mime type of the deposit
-     * @param pPackaging   The packaging
+     * @param pPackaging   The packaging. Null equals empty string.
      * @return True, if this handler can handle the current deposit
      */
     public boolean isHandled(final String pContentType, final String pPackaging) {
         return pContentType.equals(getContentType())
-                && pPackaging != null
-                && pPackaging.trim().equalsIgnoreCase(getPackaging());
+                && emptyIfNull(pPackaging).trim().equalsIgnoreCase(getPackaging());
+    }
+
+    private String emptyIfNull(String s) {
+        return (s == null) ? "" : s;
     }
 
     /**
@@ -173,7 +176,7 @@ public class DefaultFileHandler implements FileHandler {
      * @param pPackaging The value to set.
      */
     public void setPackaging(final String pPackaging) {
-        _packaging = pPackaging;
+        _packaging = emptyIfNull(pPackaging);
     }
 
     /**
