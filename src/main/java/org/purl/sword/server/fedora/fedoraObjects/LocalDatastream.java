@@ -69,6 +69,7 @@ public class LocalDatastream extends Datastream {
 	private static final Logger LOG = Logger.getLogger(LocalDatastream.class);
 	private String _path = "";
 	private String _uploadedURL = null;
+	private boolean cleanup = true;
 
 	/**
 	 * @param pID       Datastream ID
@@ -99,28 +100,37 @@ public class LocalDatastream extends Datastream {
 	 */
 	public void upload(final String pUsername, final String pPassword) throws IOException, SWORDException {
 		// Ensure no one uploads same object twice
-		if (_uploadedURL != null) {
-			return;
-		}
-		File file;
-		if (_path.startsWith("file:")) {
-			try {
-				file = new File(new URI(_path));
-			} catch (URISyntaxException e) {
-				throw new IOException("File URI is not valid: " + _path);
-			}
-		} else {
-			file = new File(_path);
-		}
-		if (file.exists()) {
-			final String fedoraUploadUrl = new XMLProperties().getFedoraURL() + "/management/upload";
-			String body = uploadFollowRedirects(fedoraUploadUrl, pUsername, pPassword, file);
-			_uploadedURL = body.trim().replaceAll("\n", "");
-		} else {
+		if (_uploadedURL != null) return;
+
+		File file = getFileInstance();
+		if (!file.exists()) {
 			final String message = "File '" + file.getAbsolutePath() + "' doesn't exist";
 			LOG.error(message);
 			throw new IOException(message);
 		}
+
+		final String fedoraUploadUrl = new XMLProperties().getFedoraURL() + "/management/upload";
+		String body = uploadFollowRedirects(fedoraUploadUrl, pUsername, pPassword, file);
+		_uploadedURL = body.trim().replaceAll("\n", "");
+
+		if (cleanup) {
+			LOG.info("Deleting temporary upload file " + _path);
+			file.delete();
+		}
+	}
+
+	public boolean isCleanup() {
+		return cleanup;
+	}
+
+	/**
+	 * Configure if the source file should be deleted after it was successfully uploaded to Fedora.
+	 * Default is `true`.
+	 *
+	 * @param cleanup True, if the source file should be deleted after successful upload.
+	 */
+	public void setCleanup(boolean cleanup) {
+		this.cleanup = cleanup;
 	}
 
 	protected String uploadFollowRedirects(final String pURL, final String pUsername, final String pPassword, File file) throws IOException {
@@ -131,7 +141,7 @@ public class LocalDatastream extends Datastream {
 		tClient.getState().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM), tUserPass);
 
 		// execute and get the response
-		LOG.error("Uploading " + this.getPath() + " to " + pURL);
+		LOG.info("Uploading " + this.getPath() + " to " + pURL);
 		PostMethod tPost = new PostMethod(pURL);
 		tPost.getParams().setParameter("Connection", "Keep-Alive");
 
@@ -172,5 +182,19 @@ public class LocalDatastream extends Datastream {
 		tContentLocation.setAttribute("TYPE", "URL");
 		tContentLocation.setAttribute("REF", _uploadedURL);
 		return tContentLocation;
+	}
+
+	private File getFileInstance() throws IOException {
+		File file;
+		if (_path.startsWith("file:")) {
+			try {
+				file = new File(new URI(_path));
+			} catch (URISyntaxException e) {
+				throw new IOException("File URI is not valid: " + _path);
+			}
+		} else {
+			file = new File(_path);
+		}
+		return file;
 	}
 }
