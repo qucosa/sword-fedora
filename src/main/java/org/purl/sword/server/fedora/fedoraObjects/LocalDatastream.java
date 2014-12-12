@@ -61,6 +61,8 @@ import org.purl.sword.server.fedora.utils.XMLProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class LocalDatastream extends Datastream {
 	private static final Logger LOG = Logger.getLogger(LocalDatastream.class);
@@ -89,35 +91,39 @@ public class LocalDatastream extends Datastream {
 
 	/**
 	 * This uploads the datastream to Fedora so that it is accessible on ingest
-	 * 
-	 * @param String Username for fedora repository
-	 * @param String Password for fedora repository
 	 *
-	 * @throws IOException if there are problems accessing the file
+	 * @param pUsername Username for fedora repository
+	 * @param pPassword Password for fedora repository
+	 * @throws IOException    if there are problems accessing the file
 	 * @throws SWORDException if there are problems contacting the repository
 	 */
 	public void upload(final String pUsername, final String pPassword) throws IOException, SWORDException {
-		if (_uploadedURL == null) { // Ensure no one uploads same object twice
-			if (new File(this.getPath()).exists()) {
-				String body = uploadFollowRedirects(new XMLProperties().getFedoraURL() + "/management/upload", pUsername, pPassword);
-			
-				if (body == null) {
-					body = "[empty response body]";
-				}
-				LOG.error("Body" + body);		
-				_uploadedURL = body.trim().replaceAll("\n", " ");
-			} else{
-				LOG.error("File '" + this.getPath() + "' dosn't exist");
-				throw new IOException("File doesn't exists: " + this.getPath());
+		// Ensure no one uploads same object twice
+		if (_uploadedURL != null) {
+			return;
+		}
+		File file;
+		if (_path.startsWith("file:")) {
+			try {
+				file = new File(new URI(_path));
+			} catch (URISyntaxException e) {
+				throw new IOException("File URI is not valid: " + _path);
 			}
-
-			// File has been uploaded now safe to delete the local copy
-
-			new File(_path).delete();
-		} 	
+		} else {
+			file = new File(_path);
+		}
+		if (file.exists()) {
+			final String fedoraUploadUrl = new XMLProperties().getFedoraURL() + "/management/upload";
+			String body = uploadFollowRedirects(fedoraUploadUrl, pUsername, pPassword, file);
+			_uploadedURL = body.trim().replaceAll("\n", "");
+		} else {
+			final String message = "File '" + file.getAbsolutePath() + "' doesn't exist";
+			LOG.error(message);
+			throw new IOException(message);
+		}
 	}
 
-	protected String uploadFollowRedirects(final String pURL, final String pUsername, final String pPassword) throws IOException {
+	protected String uploadFollowRedirects(final String pURL, final String pUsername, final String pPassword, File file) throws IOException {
 		HttpClient tClient = new HttpClient();
 		tClient.getParams().setAuthenticationPreemptive(true);
 
@@ -127,13 +133,13 @@ public class LocalDatastream extends Datastream {
 		// execute and get the response
 		LOG.error("Uploading " + this.getPath() + " to " + pURL);
 		PostMethod tPost = new PostMethod(pURL);
-		tPost.getParams().setParameter("Connection","Keep-Alive");
+		tPost.getParams().setParameter("Connection", "Keep-Alive");
 
 		LOG.debug("Content length: " + tPost.getRequestHeader("Content-length") + " content type " + tPost.getRequestHeader("Content-Type"));
 		tPost.setContentChunked(true);
 
 		// add the file part
-		Part[] parts = { new FilePart("file", new File(this.getPath())) };
+		Part[] parts = {new FilePart("file", file)};
 		tPost.setRequestEntity(new MultipartRequestEntity(parts, tPost.getParams()));
 		LOG.debug("Multipart length: " + tPost.getRequestEntity().getContentLength());
 
@@ -141,15 +147,15 @@ public class LocalDatastream extends Datastream {
 		if (responseCode >= 300 && responseCode <= 399) {
 			Header tLocationHeader = tPost.getResponseHeader("location");
 			// Redirected
-			return this.uploadFollowRedirects(tLocationHeader.getValue(), pUsername, pPassword);
+			return this.uploadFollowRedirects(tLocationHeader.getValue(), pUsername, pPassword, file);
 		}
 
 		if (responseCode != 201) {
 			LOG.error("Couldn't upload " + this.getPath() + " none 201 result: " + responseCode);
 			throw new IOException("Couldn't upload file: " + this.getPath());
-		} 
-	
-		return tPost.getResponseBodyAsString(); 
+		}
+
+		return tPost.getResponseBodyAsString();
 	}
 
 	/**
