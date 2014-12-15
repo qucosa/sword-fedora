@@ -128,41 +128,53 @@ public class StartupListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
     }
 
-    private void initLog4j() {
-        String logConfigPath = getAbsolutePathToResource(
-                orDefaultIfNull(getFirstValid(
-                                System.getProperty("log4j.configuration"),
-                                context.getInitParameter("log-config")),
-                        "WEB-INF/log4j.xml"));
-        log.info("Taking log4j config from: " + logConfigPath);
-        configure(logConfigPath);
-    }
-
-    private void initPropertiesLocation() {
-        propertiesLocation = getAbsolutePathToResource(
-                orDefaultIfNull(getFirstValid(
-                                System.getProperty("project.properties"),
-                                context.getInitParameter("project.properties")),
-                        "WEB-INF/properties.xml"));
-        log.info("Loading properties files from: " + propertiesLocation);
-    }
-
-    private String getAbsolutePathToResource(String resourcePath) {
+    private String getAbsolutePathToResource(String resourcePath) throws Exception {
+        File file;
         if (resourcePath.startsWith("/")) {
-            File file = new File(resourcePath);
-            return file.getAbsolutePath();
+            file = new File(resourcePath);
         } else {
-            // assume file is in servlet context
-            return context.getRealPath(resourcePath);
+            final String realPath = context.getRealPath(resourcePath);
+            if (realPath == null) {
+                throw new Exception("Cannot obtain absolute path to file if wrapped in war-archive.");
+            }
+            file = new File(realPath);
         }
-    }
-
-    private String orDefaultIfNull(String s, String defaultValue) {
-        return (s == null) ? defaultValue : s;
+        return file.getAbsolutePath();
     }
 
     private String getFirstValid(String... values) {
         for (String s : values) if (s != null) return s;
         return null;
+    }
+
+    private void initLog4j() {
+        try {
+            String logConfigPath = getAbsolutePathToResource(
+                    orDefaultIfNull(getFirstValid(
+                                    System.getProperty("log4j.configuration"),
+                                    context.getInitParameter("log-config")),
+                            "WEB-INF/log4j.xml"));
+            log.info("Taking log4j config from: " + logConfigPath);
+            configure(logConfigPath);
+        } catch (Exception e) {
+            log.error("Error initializing logging: " + e.getMessage());
+        }
+    }
+
+    private void initPropertiesLocation() {
+        try {
+            propertiesLocation = getAbsolutePathToResource(
+                    orDefaultIfNull(getFirstValid(
+                                    System.getProperty("project.properties"),
+                                    context.getInitParameter("project.properties")),
+                            "WEB-INF/properties.xml"));
+            log.info("Loading properties files from: " + propertiesLocation);
+        } catch (Exception e) {
+            log.fatal("Fatal Error initializing properties: " + e.getMessage());
+        }
+    }
+
+    private String orDefaultIfNull(String s, String defaultValue) {
+        return (s == null) ? defaultValue : s;
     }
 }
