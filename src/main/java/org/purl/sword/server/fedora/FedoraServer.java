@@ -77,7 +77,7 @@ public class FedoraServer implements SWORDServer {
     protected FedoraAPIM _APIM = null;
     protected FedoraAPIA _APIA = null;
     protected XMLProperties _props = null;
-    private FileHandlerFactory fileHandlerFactory;
+    protected FileHandlerFactory fileHandlerFactory;
 
     public FedoraServer() {
         _props = new XMLProperties();
@@ -182,26 +182,10 @@ public class FedoraServer implements SWORDServer {
             }
 
             ServiceDocumentQueries tServiceDoc = (ServiceDocumentQueries) this.getServiceDocument(tOnBehalfOf);
-            // Check to see if user is allowed to deposit in collection
-            if (!tServiceDoc.isAllowedToDeposit(tOnBehalfOf, tCollectionPID)) {
-                String tMessage = "User: " + tOnBehalfOf + " is not allowed to deposit in collection " + tCollectionPID;
-                LOG.debug(tMessage);
-                throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN, tMessage);
-            }
 
-            // Check to see if content type is in the allowed list
-            if (!tServiceDoc.isContentTypeAllowed(pDeposit.getContentType(), tCollectionPID)) {
-                String tDesc = "Type " + pDeposit.getContentType() + " is not accepted in collection " + tCollectionPID;
-                LOG.debug(tDesc);
-                throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, tDesc);
-            }
-
-            // Check to see if package type is in the allowed list
-            if (!tServiceDoc.isPackageTypeAllowed(pDeposit.getPackaging(), tCollectionPID)) {
-                String tDesc = "Packaging Type " + pDeposit.getPackaging() + " is not accepted in collection " + tCollectionPID;
-                LOG.debug(tDesc);
-                throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, tDesc);
-            }
+            authorizes(tServiceDoc, tOnBehalfOf, tCollectionPID);
+            contentAcceptable(tServiceDoc, pDeposit, tCollectionPID);
+            packageTypeAcceptable(tServiceDoc, pDeposit, tCollectionPID);
 
             // Call the file handlers and see which one responds that it can handle the deposit
             FileHandler tHandler = fileHandlerFactory.getFileHandler(pDeposit.getContentType(), pDeposit.getPackaging());
@@ -235,27 +219,6 @@ public class FedoraServer implements SWORDServer {
             tRuntimeExcpt.printStackTrace();
             LOG.error("Exception occured: " + tRuntimeExcpt);
             throw tRuntimeExcpt;
-        }
-    }
-
-    private void cacheResponse(String tCollectionPID, SWORDEntry tEntry) throws SWORDException {
-        File tCollectionDir = new File(_props.getEntryStoreLocation(), tCollectionPID.replaceAll(":", "_"));
-        if (!tCollectionDir.exists()) {
-            if (tCollectionDir.mkdirs()) {
-            } else {
-                LOG.warn("Cannot create directory: " + tCollectionDir.toString());
-            }
-        }
-        FileOutputStream tStream = null;
-        try {
-            tStream = new FileOutputStream(
-                    new File(tCollectionDir, tEntry.getId().replaceAll(":", "_") + ".xml"));
-            Serializer tSerializer = new Serializer(tStream, "UTF-8");
-            tSerializer.setIndent(3);
-            Document tDoc = new Document(tEntry.marshall());
-            tSerializer.write(tDoc);
-        } catch (IOException e) {
-            LOG.error("Error while caching response: " + e.getMessage());
         }
     }
 
@@ -319,6 +282,30 @@ public class FedoraServer implements SWORDServer {
         }
     }
 
+    protected void packageTypeAcceptable(ServiceDocumentQueries tServiceDoc, Deposit pDeposit, String tCollectionPID) throws SWORDException, SWORDErrorException {
+        if (!tServiceDoc.isPackageTypeAllowed(pDeposit.getPackaging(), tCollectionPID)) {
+            String tDesc = "Packaging Type " + pDeposit.getPackaging() + " is not accepted in collection " + tCollectionPID;
+            LOG.debug(tDesc);
+            throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, tDesc);
+        }
+    }
+
+    protected void contentAcceptable(ServiceDocumentQueries tServiceDoc, Deposit pDeposit, String tCollectionPID) throws SWORDException, SWORDErrorException {
+        if (!tServiceDoc.isContentTypeAllowed(pDeposit.getContentType(), tCollectionPID)) {
+            String tDesc = "Type " + pDeposit.getContentType() + " is not accepted in collection " + tCollectionPID;
+            LOG.debug(tDesc);
+            throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, tDesc);
+        }
+    }
+
+    protected void authorizes(ServiceDocumentQueries serviceDocument, String onBehalfOf, String collectionPID) throws SWORDException, SWORDErrorException {
+        if (!serviceDocument.isAllowedToDeposit(onBehalfOf, collectionPID)) {
+            String msg = "User: " + onBehalfOf + " has no write access to collection " + collectionPID;
+            LOG.debug(msg);
+            throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN, msg);
+        }
+    }
+
     /**
      * Authenticate a user
      *
@@ -339,5 +326,26 @@ public class FedoraServer implements SWORDServer {
         RepositoryInfo tInfo = _APIA.describeRepository();
         LOG.debug("Name =" + tInfo.getRepositoryName());
         LOG.debug("Repository Version =" + tInfo.getRepositoryVersion());
+    }
+
+    protected void cacheResponse(String tCollectionPID, SWORDEntry tEntry) throws SWORDException {
+        File tCollectionDir = new File(_props.getEntryStoreLocation(), tCollectionPID.replaceAll(":", "_"));
+        if (!tCollectionDir.exists()) {
+            if (tCollectionDir.mkdirs()) {
+            } else {
+                LOG.warn("Cannot create directory: " + tCollectionDir.toString());
+            }
+        }
+        FileOutputStream tStream = null;
+        try {
+            tStream = new FileOutputStream(
+                    new File(tCollectionDir, tEntry.getId().replaceAll(":", "_") + ".xml"));
+            Serializer tSerializer = new Serializer(tStream, "UTF-8");
+            tSerializer.setIndent(3);
+            Document tDoc = new Document(tEntry.marshall());
+            tSerializer.write(tDoc);
+        } catch (IOException e) {
+            LOG.error("Error while caching response: " + e.getMessage());
+        }
     }
 }

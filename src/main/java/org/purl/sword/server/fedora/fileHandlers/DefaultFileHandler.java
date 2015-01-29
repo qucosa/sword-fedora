@@ -143,6 +143,16 @@ public class DefaultFileHandler implements FileHandler {
     }
 
     /**
+     * Empty implementation stub.
+     *
+     * @throws java.lang.UnsupportedOperationException in any case
+     * @link FileHandler.updateDeposit
+     */
+    public SWORDEntry updateDeposit(DepositCollection depositCollection, ServiceDocument serviceDocument) throws SWORDException {
+        throw new UnsupportedOperationException("Update method is not implemented by default.");
+    }
+
+    /**
      * Get _contentType.
      *
      * @return _contentType as String.

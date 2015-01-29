@@ -36,19 +36,22 @@
  */
 package org.purl.sword.server.fedora;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.fcrepo.server.types.gen.*;
-import org.purl.sword.base.ErrorCodes;
-import org.purl.sword.base.SWORDAuthenticationException;
-import org.purl.sword.base.SWORDErrorException;
-import org.purl.sword.base.SWORDException;
+import org.purl.sword.atom.Link;
+import org.purl.sword.base.*;
 import org.purl.sword.server.fedora.baseExtensions.DeleteRequest;
+import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 import org.purl.sword.server.fedora.baseExtensions.ServiceDocumentQueries;
+import org.purl.sword.server.fedora.fileHandlers.FileHandler;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Iterator;
 
 public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
 
@@ -61,37 +64,98 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
      * @param deleteRequest The delete request object
      */
     public void doDelete(DeleteRequest deleteRequest) throws SWORDAuthenticationException, SWORDException, SWORDErrorException, CRUDObjectNotFoundException {
-        authenticates(
-                deleteRequest.getUsername(),
-                deleteRequest.getPassword());
+        RequestInfo requestInfo = new RequestInfo(deleteRequest);
 
-        String onBehalfOf =
-                (deleteRequest.getOnBehalfOf() == null) ? deleteRequest.getUsername() : deleteRequest.getOnBehalfOf();
-
-        String tLocation = deleteRequest.getLocation();
-        if (tLocation.endsWith("/")) {
-            tLocation = tLocation.substring(0, tLocation.length() - 1);
-        }
-        String[] tWords = tLocation.split("/");
-        final String collectionPID = tWords[tWords.length - 2];
-        final String objectPID = tWords[tWords.length - 1];
+        authenticates(requestInfo.getUsername(), requestInfo.getPassword());
+        final String collectionPID = requestInfo.getCollectionPID();
+        final String objectPID = requestInfo.getObjectPID();
+        final String onBehalfOf = requestInfo.getOnBehalfOf();
 
         ServiceDocumentQueries serviceDocument = (ServiceDocumentQueries) this.getServiceDocument(onBehalfOf);
-        // Check to see if user is allowed to deposit in collection
-        // and is therefore allowed to delete
-        if (!serviceDocument.isAllowedToDeposit(onBehalfOf, collectionPID)) {
-            String msg = "User: " + onBehalfOf + " is not allowed to delete from collection " + collectionPID;
-            log.debug(msg);
-            throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN, msg);
-        }
+        authorizes(serviceDocument, onBehalfOf, collectionPID);
 
         if (deleteRequest.isNoOp()) {
             log.debug("NOOP. No delete performed.");
             return;
         }
 
-        // Modify the object's state to Deleted,
-        // but leave other properties unchanged
+        FieldSearchResult fsr = getFieldSearchResult(objectPID);
+        if (fsr.getResultList().getObjectFields().isEmpty()) {
+            throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
+        }
+
+        setObjectState(objectPID, fsr, "D", "Deleted on behalf of " + onBehalfOf);
+        log.debug("Set object state to deleted: " + objectPID);
+
+        safeDeleteCachedResponse(collectionPID, objectPID);
+    }
+
+    /**
+     * Perform UPDATE request on behalf of a user. The user must have the permission to deposit in the targeted
+     * collection. The updated object must exist in the given location.
+     *
+     * @param deposit The update request object
+     * @see {CRUDSWORDServer.doUpdate}
+     */
+    public DepositResponse doUpdate(Deposit deposit) throws SWORDAuthenticationException, SWORDException, SWORDErrorException, CRUDObjectNotFoundException {
+        if (deposit.isVerbose()) {
+            log.setLevel(Level.DEBUG);
+        }
+
+        RequestInfo requestInfo = new RequestInfo(deposit);
+
+        authenticates(requestInfo.getUsername(), requestInfo.getPassword());
+        final String collectionPID = requestInfo.getCollectionPID();
+        final String objectPID = requestInfo.getObjectPID();
+        final String onBehalfOf = requestInfo.getOnBehalfOf();
+
+        ServiceDocumentQueries serviceDocument = (ServiceDocumentQueries) this.getServiceDocument(onBehalfOf);
+        authorizes(serviceDocument, onBehalfOf, collectionPID);
+        contentAcceptable(serviceDocument, deposit, collectionPID);
+        packageTypeAcceptable(serviceDocument, deposit, collectionPID);
+
+        FileHandler fileHandler = fileHandlerFactory.getFileHandler(deposit.getContentType(), deposit.getPackaging());
+
+        final DepositResponse depositResponse = new DepositResponse(HttpServletResponse.SC_OK);
+
+        if (deposit.isNoOp()) {
+            log.debug("NOOP. No update performed.");
+            depositResponse.setHttpResponse(HttpServletResponse.SC_ACCEPTED);
+            return depositResponse;
+        }
+
+        SWORDEntry swordEntry = fileHandler.updateDeposit(
+                new DepositCollection(deposit, collectionPID), (ServiceDocument) serviceDocument);
+        depositResponse.setEntry(swordEntry);
+
+        Link link = getEditLink(swordEntry);
+        if (link != null) {
+            depositResponse.setLocation(link.getHref());
+        }
+
+        FieldSearchResult fsr = getFieldSearchResult(objectPID);
+        if (fsr.getResultList().getObjectFields().isEmpty()) {
+            throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
+        }
+
+        cacheResponse(collectionPID, swordEntry);
+
+        return depositResponse;
+    }
+
+    protected Link getEditLink(SWORDEntry swordEntry) {
+        Link link = null;
+        Iterator<Link> linkIterator = swordEntry.getLinks();
+        while (linkIterator.hasNext()) {
+            link = linkIterator.next();
+            if (link.getRel().equals("edit")) {
+                break;
+            }
+        }
+        return link;
+    }
+
+    private FieldSearchResult getFieldSearchResult(final String objectPID) {
         FieldSearchQuery fsq = new FieldSearchQuery();
         fsq.setConditions(new JAXBElement<FieldSearchQuery.Conditions>(
                 new QName("conditions"),
@@ -104,7 +168,7 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
                     }});
                 }}
         ));
-        FieldSearchResult fsr = _APIA.findObjects(
+        return _APIA.findObjects(
                 new ArrayOfString() {{
                     getItem().add("pid");
                     getItem().add("ownerId");
@@ -112,19 +176,6 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
                 }},
                 BigInteger.ONE,
                 fsq);
-
-        if (fsr.getResultList().getObjectFields().isEmpty()) {
-            throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
-        }
-
-        ObjectFields ofs = fsr.getResultList().getObjectFields().get(0);
-        String label = ofs.getLabel().getValue();
-        String ownerId = ofs.getOwnerId().getValue();
-
-        _APIM.modifyObject(objectPID, "D", label, ownerId, "Deleted on behalf of " + onBehalfOf);
-        log.debug("Set object state to deleted: " + objectPID);
-
-        safeDeleteCachedResponse(collectionPID, objectPID);
     }
 
     private void safeDeleteCachedResponse(String collectionPID, String objectPID) {
@@ -139,4 +190,65 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
         }
     }
 
+    private void setObjectState(String objectPID, FieldSearchResult fsr, String state, String message) {
+        ObjectFields ofs = fsr.getResultList().getObjectFields().get(0);
+        String label = ofs.getLabel().getValue();
+        String ownerId = ofs.getOwnerId().getValue();
+        _APIM.modifyObject(objectPID, state, label, ownerId, message);
+    }
+
+    private class RequestInfo {
+        private String location;
+        private String collectionPID;
+        private String objectPID;
+        private String onBehalfOf;
+        private String username;
+        private String password;
+
+        public RequestInfo(DeleteRequest dr) {
+            location = dr.getLocation();
+            onBehalfOf = (dr.getOnBehalfOf() == null) ? dr.getUsername() : dr.getOnBehalfOf();
+            username = dr.getUsername();
+            password = dr.getPassword();
+            initPIDs();
+        }
+
+        public RequestInfo(Deposit d) {
+            location = d.getLocation();
+            onBehalfOf = (d.getOnBehalfOf() == null) ? d.getUsername() : d.getOnBehalfOf();
+            username = d.getUsername();
+            password = d.getPassword();
+            initPIDs();
+        }
+
+        public String getCollectionPID() {
+            return collectionPID;
+        }
+
+        public String getObjectPID() {
+            return objectPID;
+        }
+
+        public String getOnBehalfOf() {
+            return onBehalfOf;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        private void initPIDs() {
+            String s = location;
+            if (s.endsWith("/")) {
+                s = s.substring(0, s.length() - 1);
+            }
+            String[] tWords = s.split("/");
+            collectionPID = tWords[tWords.length - 2];
+            objectPID = tWords[tWords.length - 1];
+        }
+    }
 }

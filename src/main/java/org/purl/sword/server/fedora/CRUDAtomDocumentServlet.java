@@ -45,9 +45,50 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.Writer;
 
 public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
     private static Logger log = Logger.getLogger(CRUDAtomDocumentServlet.class);
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        log.info("UPDATE " + request.getRequestURL().toString());
+        CRUDSWORDServer server = obtainCRUDServerInstanceOrNull();
+        if (server == null) {
+            log.warn("UPDATE not supported: Configured SWORD server instance doesn't implement CRUD interface.");
+            response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
+        } else {
+            try {
+                Deposit updateRequest = buildUpdateRequest(request);
+                DepositResponse depositResponse = server.doUpdate(updateRequest);
+                echoBackUserAgent(request, depositResponse);
+                echoBackPackagingFormat(updateRequest, depositResponse);
+                response.setStatus(depositResponse.getHttpResponse());
+                setDepositLocationIfGiven(response, depositResponse);
+                writeResponseContent(response, depositResponse);
+            } catch (SWORDException e) {
+                log.error(e.getMessage());
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } catch (SWORDAuthenticationException e) {
+                log.error(e.getMessage());
+                // Ask for credentials again
+                String s = "Basic realm=\"SWORD\"";
+                response.setHeader("WWW-Authenticate", s);
+                response.setStatus(401);
+            } catch (CRUDObjectNotFoundException e) {
+                log.debug(e.getMessage());
+                response.setStatus(404);
+            } catch (SWORDErrorException e) {
+                // Get the details and send the right SWORD error document
+                log.error(e.toString());
+                this.makeErrorDocument(e.getErrorURI(),
+                        e.getStatus(),
+                        e.getDescription(),
+                        request,
+                        response);
+            }
+        }
+    }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -84,10 +125,6 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
             }
     }
 
-    private CRUDSWORDServer obtainCRUDServerInstanceOrNull() {
-        return myRepository instanceof CRUDSWORDServer ? (CRUDSWORDServer) myRepository : null;
-    }
-
     private DeleteRequest buildDeleteRequest(HttpServletRequest request) throws SWORDAuthenticationException, SWORDErrorException {
         DeleteRequest deleteRequest = new DeleteRequest();
         setAuthenticationDetails(request, deleteRequest);
@@ -96,6 +133,62 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         setOnBehalfHeader(request, deleteRequest);
         setXNOOPHeader(request, deleteRequest);
         return deleteRequest;
+    }
+
+    private Deposit buildUpdateRequest(HttpServletRequest request) throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
+        Deposit deposit = new Deposit();
+        setAuthenticationDetails(request, deposit);
+        setOnBehalfHeader(request, deposit);
+        setXNOOPHeader(request, deposit);
+        setVerboseHeader(request, deposit);
+        setContentLength(request, deposit);
+        deposit.setIPAddress(request.getRemoteAddr());
+        deposit.setLocation(getUrl(request));
+        deposit.setPackaging(request.getHeader(HttpHeaders.X_PACKAGING));
+        deposit.setSlug(request.getHeader(HttpHeaders.SLUG));
+        deposit.setContentDisposition(request.getHeader(HttpHeaders.CONTENT_DISPOSITION));
+        deposit.setContentType(request.getContentType());
+        try {
+            deposit.setMd5(request.getHeader("Content-MD5"));
+            // The base implementation in DepositServlet performs MD5 checking here. We
+            // leave this to the FileHandler.
+            deposit.setFile(request.getInputStream());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new SWORDException("Having trouble getting content from HTTP request", e);
+        }
+        return deposit;
+    }
+
+    private void echoBackPackagingFormat(Deposit updateRequest, DepositResponse depositResponse) {
+        final String packagingFormat = updateRequest.getPackaging();
+        if ((packagingFormat != null) && (!packagingFormat.isEmpty())) {
+            depositResponse.getEntry().setPackaging(packagingFormat);
+        }
+    }
+
+    private void echoBackUserAgent(HttpServletRequest request, DepositResponse depositResponse) {
+        final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        if ((userAgent != null) && (!userAgent.isEmpty())) {
+            depositResponse.getEntry().setUserAgent(userAgent);
+        }
+    }
+
+    private CRUDSWORDServer obtainCRUDServerInstanceOrNull() {
+        return myRepository instanceof CRUDSWORDServer ? (CRUDSWORDServer) myRepository : null;
+    }
+
+    private void setAuthenticationDetails(HttpServletRequest request, Deposit deposit) throws SWORDAuthenticationException {
+        String usernamePassword = getUsernamePassword(request);
+        if ((usernamePassword != null) && (!usernamePassword.isEmpty())) {
+            int p = usernamePassword.indexOf(":");
+            if (p != -1) {
+                deposit.setUsername(usernamePassword.substring(0, p));
+                deposit.setPassword(usernamePassword.substring(p + 1));
+            }
+        } else if (authenticateWithBasic()) {
+            throw new SWORDAuthenticationException("No credentials");
+        }
     }
 
     private void setAuthenticationDetails(HttpServletRequest request, DeleteRequest deleteRequest) throws SWORDAuthenticationException {
@@ -111,10 +204,58 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         }
     }
 
+    private void setContentLength(HttpServletRequest request, Deposit deposit) {
+        String cl = request.getHeader(HttpHeaders.CONTENT_LENGTH);
+        if ((cl != null) && (!cl.equals(""))) {
+            deposit.setContentLength(Integer.parseInt(cl));
+        }
+    }
+
+    private void setDepositLocationIfGiven(HttpServletResponse response, DepositResponse depositResponse) {
+        final String depositResponseLocation = depositResponse.getLocation();
+        if ((depositResponseLocation != null) && (!depositResponseLocation.isEmpty())) {
+            response.setHeader("Location", depositResponseLocation);
+        }
+    }
+
     private void setOnBehalfHeader(HttpServletRequest request, DeleteRequest deleteRequest) {
         String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
         if ((onBehalfOf != null) && (!onBehalfOf.isEmpty())) {
             deleteRequest.setOnBehalfOf(onBehalfOf);
+        }
+    }
+
+    private void setOnBehalfHeader(HttpServletRequest request, Deposit deposit) {
+        String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
+        if ((onBehalfOf != null) && (!onBehalfOf.isEmpty())) {
+            deposit.setOnBehalfOf(onBehalfOf);
+        }
+    }
+
+    private void setVerboseHeader(HttpServletRequest request, Deposit deposit) throws SWORDErrorException {
+        String verbose = request.getHeader(HttpHeaders.X_VERBOSE);
+        if ((verbose != null) && (verbose.equals("true"))) {
+            deposit.setVerbose(true);
+        } else if ((verbose != null) && (verbose.equals("false"))) {
+            deposit.setVerbose(false);
+        } else if (verbose == null) {
+            deposit.setVerbose(false);
+        } else {
+            throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad verbose header");
+        }
+    }
+
+    private void setXNOOPHeader(HttpServletRequest request, Deposit deposit) throws SWORDErrorException {
+        String noop = request.getHeader(HttpHeaders.X_NO_OP);
+        log.warn("X_NO_OP value is " + noop);
+        if ((noop != null) && (noop.equals("true"))) {
+            deposit.setNoOp(true);
+        } else if ((noop != null) && (noop.equals("false"))) {
+            deposit.setNoOp(false);
+        } else if (noop == null) {
+            deposit.setNoOp(false);
+        } else {
+            throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
         }
     }
 
@@ -130,5 +271,12 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         } else {
             throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
         }
+    }
+
+    private void writeResponseContent(HttpServletResponse response, DepositResponse depositResponse) throws IOException {
+        response.setContentType("application/atom+xml;charset=UTF-8");
+        Writer w = response.getWriter();
+        w.write(depositResponse.marshall());
+        w.flush();
     }
 }
