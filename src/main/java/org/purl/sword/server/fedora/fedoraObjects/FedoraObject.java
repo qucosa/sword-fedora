@@ -1,6 +1,4 @@
-package org.purl.sword.server.fedora.fedoraObjects;
-
-/**
+/*
  * Copyright (c) 2007, Aberystwyth University
  *
  * All rights reserved.
@@ -44,6 +42,7 @@ package org.purl.sword.server.fedora.fedoraObjects;
  * self
  *
  */
+package org.purl.sword.server.fedora.fedoraObjects;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.log4j.Logger;
