@@ -82,11 +82,11 @@ public class FedoraObject {
     protected String _fedoraVersion = null;
 
     /**
-     * Contacts the Fedora repository to retrieve the next avilable PID
+     * Contacts the Fedora repository to retrieve the next available PID
      *
      * @param pUsername Username to access fedora
      * @param pPassword Password to access fedora
-     * @throws SWORDException if conection refused to fedora repository
+     * @throws SWORDException if connection refused to fedora repository
      */
     public FedoraObject(final String pUsername, final String pPassword) throws SWORDException {
         _username = pUsername;
@@ -355,6 +355,4 @@ public class FedoraObject {
 
         return tDisseminatorsList;
     }
-
-
 }
