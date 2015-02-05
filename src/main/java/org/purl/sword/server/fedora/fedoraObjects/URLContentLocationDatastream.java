@@ -36,44 +36,21 @@
  */
 package org.purl.sword.server.fedora.fedoraObjects;
 
-import org.jdom.Element;
-import org.jdom.Namespace;
-
 /**
- * This is a datastream which is ingested through a URL but after ingest resides in the repository
- *
- * @author Glen Robson
- * @version 1.0
+ * Interface for datastreams that have a URL denoting the content location.
  */
-public class ManagedDatastream extends Datastream implements URLContentLocationDatastream {
-    protected String _URL = "";
-
-    public ManagedDatastream(final String pID, final String pMimeType, final String pURL) {
-        super(pID, State.ACTIVE, ControlGroup.MANAGED, pMimeType);
-        super.setLabel("Retrieved file from " + pURL);
-
-        this.setURL(pURL);
-    }
-
-    public String getURL() {
-        return _URL;
-    }
-
-    public void setURL(final String pURL) {
-        _URL = pURL;
-    }
+public interface URLContentLocationDatastream {
+    /**
+     * Get URL.
+     *
+     * @return URL as String.
+     */
+    String getURL();
 
     /**
-     * Converts this datastream into FOXML so it can be ingested.
+     * Set URL.
      *
-     * @param FOXML the FOXML namespace
-     * @return Element the FOXML datastream node
+     * @param pURL the value to set.
      */
-    public Element dsToFOXML(final Namespace FOXML) {
-        Element tContentLocation = new Element("contentLocation", FOXML);
-        tContentLocation.setAttribute("TYPE", "URL");
-        tContentLocation.setAttribute("REF", this.getURL());
-
-        return tContentLocation;
-    }
+    void setURL(String pURL);
 }

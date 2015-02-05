@@ -41,6 +41,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.log4j.Logger;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
+import org.fcrepo.server.types.gen.DatastreamDef;
 import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -52,7 +53,6 @@ import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
@@ -126,17 +126,14 @@ public class FedoraRepository {
     public void ingest(FedoraObject fedoraFedoraObject) throws SWORDException {
         uploadLocalDatastreams(fedoraFedoraObject.getDatastreams());
 
-        log.debug("Ready to upload xml");
-        ByteArrayOutputStream tByteArray = new ByteArrayOutputStream();
-        XMLOutputter tOut = new XMLOutputter(Format.getPrettyFormat());
-
         boolean fedora3compatibility = (fedoraVersion.startsWith("3"));
 
         // upload foxml
         Document tFOXML = fedoraFedoraObject.toFOXML(fedora3compatibility);
+        ByteArrayOutputStream tByteArray = new ByteArrayOutputStream();
+        XMLOutputter tOut = new XMLOutputter(Format.getPrettyFormat());
         try {
             tOut.output(tFOXML, tByteArray);
-            tOut.output(tFOXML, new java.io.FileOutputStream("/tmp/test.xml"));
 
             String tXMLFormat;
             if (fedora3compatibility) {
@@ -164,6 +161,76 @@ public class FedoraRepository {
         }
     }
 
+    /**
+     * Modify an existing XML datastream by updating content and properties.
+     *
+     * @param pid    PID of the targeted object
+     * @param update Updated Datastream information
+     * @throws SWORDException if something goes wrong
+     */
+    public void modifyDatastream(String pid, Datastream update, String logMessage) throws SWORDException {
+        uploadDatastreamIfLocal(update);
+        org.fcrepo.server.types.gen.Datastream original = _APIM.getDatastream(pid, update.getId(), null);
+        if (update instanceof InlineDatastream) {
+            byte[] content = serializeContent((InlineDatastream) update);
+            _APIM.modifyDatastreamByValue(
+                    pid,
+                    update.getId(),
+                    original.getAltIDs(),
+                    update.getLabel(),
+                    update.getMimeType(),
+                    original.getFormatURI(),
+                    content,
+                    original.getChecksumType(),
+                    original.getChecksum(),
+                    logMessage,
+                    false);
+        } else if (update instanceof URLContentLocationDatastream) {
+            _APIM.modifyDatastreamByReference(
+                    pid,
+                    update.getId(),
+                    original.getAltIDs(),
+                    update.getLabel(),
+                    update.getMimeType(),
+                    original.getFormatURI(),
+                    ((URLContentLocationDatastream) update).getURL(),
+                    original.getChecksumType(),
+                    original.getChecksum(),
+                    logMessage,
+                    false);
+        } else {
+            throw new SWORDException("Unknown datastream type.");
+        }
+    }
+
+
+    /**
+     * Alter the state of a datastream
+     *
+     * @param pid        PID of the target object
+     * @param dsid       ID of the datastream to be modified
+     * @param logMessage Message for audit log
+     */
+    public void setDatastreamState(String pid, String dsid, State state, String logMessage) {
+        _APIM.setDatastreamState(pid, dsid, state.toString(), logMessage);
+    }
+
+    /**
+     * Check if a datastream exists for a given object.
+     *
+     * @param pid  PID of the object in question
+     * @param dsid ID of the datastream
+     * @return True, if a datastream with the goven ID exists for the specified object. False otherwise.
+     */
+    public boolean hasDatastream(String pid, String dsid) {
+        for (DatastreamDef dsdef : _APIA.listDatastreams(pid, null)) {
+            if (dsdef.getID().equals(dsid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void authenticate(String username, String password, BindingProvider bindingProvider) {
         Map<String, String> requestHeaders = new HashMap<String, String>();
         requestHeaders.put(BindingProvider.USERNAME_PROPERTY, username);
@@ -185,18 +252,31 @@ public class FedoraRepository {
         _APIM = (FedoraAPIM) factoryBean.create();
     }
 
-    private void uploadLocalDatastreams(List<Datastream> datastreams) throws SWORDException {
+    private byte[] serializeContent(InlineDatastream ds) throws SWORDException {
         try {
-            log.debug("Uploading local datastreams");
-            for (Datastream datastream : datastreams) {
-                if (datastream instanceof LocalDatastream) {
-                    ((LocalDatastream) datastream).upload(username, password);
-                }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+            xmlOutputter.output(ds.toXML(), byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new SWORDException("Failed serializing XML data: " + e.getMessage());
+        }
+    }
+
+    private void uploadDatastreamIfLocal(Datastream datastream) throws SWORDException {
+        try {
+            if (datastream instanceof LocalDatastream) {
+                ((LocalDatastream) datastream).upload(username, password);
             }
-        } catch (MalformedURLException tExcpt) {
-            throw new SWORDException("Can't access Fedora for upload", tExcpt);
         } catch (IOException tIOExcpt) {
             throw new SWORDException("Error accessing uploaded file: ", tIOExcpt);
+        }
+    }
+
+    private void uploadLocalDatastreams(List<Datastream> datastreams) throws SWORDException {
+        log.debug("Uploading local datastreams");
+        for (Datastream datastream : datastreams) {
+            uploadDatastreamIfLocal(datastream);
         }
     }
 

@@ -124,6 +124,11 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
             return depositResponse;
         }
 
+        FieldSearchResult fsr = getFieldSearchResult(objectPID);
+        if (fsr.getResultList().getObjectFields().isEmpty()) {
+            throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
+        }
+
         SWORDEntry swordEntry = fileHandler.updateDeposit(
                 new DepositCollection(deposit, collectionPID), (ServiceDocument) serviceDocument);
         depositResponse.setEntry(swordEntry);
@@ -133,10 +138,6 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
             depositResponse.setLocation(link.getHref());
         }
 
-        FieldSearchResult fsr = getFieldSearchResult(objectPID);
-        if (fsr.getResultList().getObjectFields().isEmpty()) {
-            throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
-        }
 
         cacheResponse(collectionPID, swordEntry);
 

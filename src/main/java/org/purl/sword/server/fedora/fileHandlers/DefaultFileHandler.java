@@ -48,7 +48,6 @@ import org.purl.sword.server.fedora.FedoraServer;
 import org.purl.sword.server.fedora.baseExtensions.DepositCollection;
 import org.purl.sword.server.fedora.baseExtensions.XMLServiceDocument;
 import org.purl.sword.server.fedora.fedoraObjects.*;
-import org.purl.sword.server.fedora.fedoraObjects.FedoraObject;
 import org.purl.sword.server.fedora.utils.XMLProperties;
 
 import java.io.FileOutputStream;
@@ -136,6 +135,8 @@ public class DefaultFileHandler implements FileHandler {
         }
         tNewFedoraObject.setDisseminators(this.getDisseminators(pDeposit, tNewFedoraObject.getDatastreams()));
 
+        validateObject(tNewFedoraObject);
+
         if (!pDeposit.isNoOp()) { // Don't ingest if no op is set
             repository.ingest(tNewFedoraObject);
         }
@@ -151,6 +152,16 @@ public class DefaultFileHandler implements FileHandler {
      */
     public SWORDEntry updateDeposit(DepositCollection depositCollection, ServiceDocument serviceDocument) throws SWORDException {
         throw new UnsupportedOperationException("Update method is not implemented by default.");
+    }
+
+    /**
+     * Override to validate constructed object before ingest.
+     * If the object is not valid, stop the ingest.
+     *
+     * @param fedoraObject The constructed object
+     * @throws SWORDException if the object is not valid.
+     */
+    public void validateObject(FedoraObject fedoraObject) throws SWORDException {
     }
 
     /**
