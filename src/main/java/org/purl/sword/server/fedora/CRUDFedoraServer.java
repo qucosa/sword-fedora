@@ -129,6 +129,9 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
             throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
         }
 
+        // use deposit ID to transport target object PID
+        deposit.setDepositID(objectPID);
+
         SWORDEntry swordEntry = fileHandler.updateDeposit(
                 new DepositCollection(deposit, collectionPID), (ServiceDocument) serviceDocument);
         depositResponse.setEntry(swordEntry);

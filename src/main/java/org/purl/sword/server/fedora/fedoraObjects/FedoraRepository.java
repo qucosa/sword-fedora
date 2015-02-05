@@ -163,9 +163,11 @@ public class FedoraRepository {
 
     /**
      * Modify an existing XML datastream by updating content and properties.
+     * If a local datastream is passed, it get's uploaded to Fedora prior to ingest.
      *
-     * @param pid    PID of the targeted object
-     * @param update Updated Datastream information
+     * @param pid        PID of the targeted object
+     * @param update     Updated Datastream information
+     * @param logMessage Message for audit log
      * @throws SWORDException if something goes wrong
      */
     public void modifyDatastream(String pid, Datastream update, String logMessage) throws SWORDException {
@@ -199,10 +201,70 @@ public class FedoraRepository {
                     logMessage,
                     false);
         } else {
-            throw new SWORDException("Unknown datastream type.");
+            throw new SWORDException("Unknown datastream type");
         }
     }
 
+    /**
+     * Add a new datastream to an existing object.
+     * If a local datastream is passed, it get's uploaded to Fedora prior to ingest.
+     * <p/>
+     * The checksum type will be set to DISABLED.
+     *
+     * @param pid        PID of the targeted object
+     * @param ds         Updated Datastream information
+     * @param logMessage Message for audit log
+     * @throws SWORDException if something goes wrong
+     */
+    public void addDatastream(String pid, Datastream ds, String logMessage) throws SWORDException {
+        uploadDatastreamIfLocal(ds);
+        if (ds instanceof URLContentLocationDatastream) {
+            _APIM.addDatastream(
+                    pid,
+                    ds.getId(),
+                    null,
+                    ds.getLabel(),
+                    ds.isVersionable(),
+                    ds.getMimeType(),
+                    null,
+                    ((URLContentLocationDatastream) ds).getURL(),
+                    ds.getControlGroup().toString(),
+                    ds.getState().toString(),
+                    "DISABLED",
+                    null,
+                    logMessage);
+        } else if (ds instanceof InlineDatastream) {
+            _APIM.addDatastream(
+                    pid,
+                    ds.getId(),
+                    null,
+                    ds.getLabel(),
+                    ds.isVersionable(),
+                    ds.getMimeType(),
+                    null,
+                    null,
+                    ds.getControlGroup().toString(),
+                    ds.getState().toString(),
+                    "DISABLED",
+                    null,
+                    "[creation] " + logMessage);
+            byte[] content = serializeContent((InlineDatastream) ds);
+            _APIM.modifyDatastreamByValue(
+                    pid,
+                    ds.getId(),
+                    null,
+                    ds.getLabel(),
+                    ds.getMimeType(),
+                    null,
+                    content,
+                    null,
+                    null,
+                    "[content] " + logMessage,
+                    false);
+        } else {
+            throw new SWORDException("Unknown datastream type");
+        }
+    }
 
     /**
      * Alter the state of a datastream
@@ -220,7 +282,7 @@ public class FedoraRepository {
      *
      * @param pid  PID of the object in question
      * @param dsid ID of the datastream
-     * @return True, if a datastream with the goven ID exists for the specified object. False otherwise.
+     * @return True, if a datastream with the given ID exists for the specified object. False otherwise.
      */
     public boolean hasDatastream(String pid, String dsid) {
         for (DatastreamDef dsdef : _APIA.listDatastreams(pid, null)) {

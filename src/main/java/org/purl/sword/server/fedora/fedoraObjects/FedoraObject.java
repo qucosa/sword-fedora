@@ -161,9 +161,10 @@ public class FedoraObject {
     private Element getObjectPropsXML(boolean fedora3compatibility) {
         Element tObjectPropsEl = new Element("objectProperties", NS_FOXML);
         for (Property tProp : this.getIdentifiers()) {
-            if (!fedora3compatibility && tProp.getName().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
-                tObjectPropsEl.addContent(tProp.toFOXML(NS_FOXML));
+            if (fedora3compatibility && tProp.getName().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+                continue;
             }
+            tObjectPropsEl.addContent(tProp.toFOXML(NS_FOXML));
         }
         return tObjectPropsEl;
     }
