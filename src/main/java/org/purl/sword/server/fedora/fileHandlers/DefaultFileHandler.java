@@ -104,10 +104,6 @@ public class DefaultFileHandler implements FileHandler {
                 && emptyIfNull(pPackaging).trim().equalsIgnoreCase(getPackaging());
     }
 
-    private String emptyIfNull(String s) {
-        return (s == null) ? "" : s;
-    }
-
     /**
      * This is the main method that is called to ingest a deposit. Override this if
      * you want complete control over the ingest. This method calls all the other methods.
@@ -118,28 +114,54 @@ public class DefaultFileHandler implements FileHandler {
      */
     public SWORDEntry ingestDeposit(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException {
 
-        FedoraObject tNewObject = new FedoraObject(pDeposit.getUsername(), pDeposit.getPassword());
+        FedoraRepository repository = new FedoraRepository(_props, pDeposit.getUsername(), pDeposit.getPassword());
+        repository.connect();
 
-        tNewObject.setIdentifiers(this.getIdentifiers(pDeposit));
-        tNewObject.setDC(this.getDublinCore(pDeposit));
-        tNewObject.setRelationships(this.getRelationships(pDeposit));
+        final String pid = repository.mintPid();
+        FedoraObject tNewFedoraObject = new FedoraObject(pid);
+
+        tNewFedoraObject.setIdentifiers(this.getIdentifiers(pDeposit));
+        tNewFedoraObject.setDc(this.getDublinCore(pDeposit));
+        tNewFedoraObject.setRelsext(this.getRelationships(pDeposit));
         try {
             List<Datastream> tDatastreamList = this.getDatastreams(pDeposit);
             this.ensureValidDSIds(tDatastreamList);
-            tNewObject.setDatastreams(tDatastreamList);
+            tNewFedoraObject.setDatastreams(tDatastreamList);
         } catch (IOException tIOExcpt) {
             tIOExcpt.printStackTrace();
             LOG.debug("Exception");
             LOG.error("Couldn't access uploaded file" + tIOExcpt.toString());
             throw new SWORDException("Couldn't access uploaded file", tIOExcpt);
         }
-        tNewObject.setDisseminators(this.getDisseminators(pDeposit, tNewObject.getDatastreams()));
+        tNewFedoraObject.setDisseminators(this.getDisseminators(pDeposit, tNewFedoraObject.getDatastreams()));
+
+        validateObject(tNewFedoraObject);
 
         if (!pDeposit.isNoOp()) { // Don't ingest if no op is set
-            tNewObject.ingest();
+            repository.ingest(tNewFedoraObject);
         }
 
-        return this.getSWORDEntry(pDeposit, pServiceDocument, tNewObject);
+        return this.getSWORDEntry(pDeposit, pServiceDocument, tNewFedoraObject);
+    }
+
+    /**
+     * Empty implementation stub.
+     *
+     * @throws java.lang.UnsupportedOperationException in any case
+     * @link FileHandler.updateDeposit
+     */
+    public SWORDEntry updateDeposit(DepositCollection depositCollection, ServiceDocument serviceDocument) throws SWORDException {
+        throw new UnsupportedOperationException("Update method is not implemented by default.");
+    }
+
+    /**
+     * Override to validate constructed object before ingest.
+     * If the object is not valid, stop the ingest.
+     *
+     * @param fedoraObject The constructed object
+     * @throws SWORDException if the object is not valid.
+     */
+    public void validateObject(FedoraObject fedoraObject) throws SWORDException {
     }
 
     /**
@@ -317,7 +339,7 @@ public class DefaultFileHandler implements FileHandler {
         this.addServiceDocEntries(tEntry, ((XMLServiceDocument) pServiceDocument).getCollection(pDeposit.getCollectionPid()));
         this.addDepositEntries(tEntry, pDeposit);
         this.addIngestEntries(pDeposit, tEntry, pFedoraObj);
-        this.addDCEntries(tEntry, pFedoraObj.getDC());
+        this.addDCEntries(tEntry, pFedoraObj.getDc());
 
         tEntry.setPublished(this.getCurrDateAsAtom());
         tEntry.setUpdated(this.getCurrDateAsAtom());
@@ -370,7 +392,7 @@ public class DefaultFileHandler implements FileHandler {
      *
      * @param pDeposit   The deposit and its associated collection
      * @param pEntry     The entry to add the values to
-     * @param pFedoraObj The ignested object
+     * @param pFedoraObj The ingested object
      * @throws SWORDException if there is a problem accessing the properties file to find the URL to the deposit
      */
     protected void addIngestEntries(final DepositCollection pDeposit, final SWORDEntry pEntry, final FedoraObject pFedoraObj) throws SWORDException {
@@ -380,7 +402,7 @@ public class DefaultFileHandler implements FileHandler {
         } catch (InvalidMediaTypeException tInvalidMedia) {
             LOG.error("Invalid media type '" + this.getContentType() + "':" + tInvalidMedia.toString());
         }
-        tContent.setSource(pFedoraObj.getURLToDS(this.getLinkName(pDeposit)));
+        tContent.setSource(_props.getExternalDSURL(pFedoraObj.getPid(), this.getLinkName(pDeposit)));
         pEntry.setContent(tContent);
 
         pEntry.setId(pFedoraObj.getPid());
@@ -413,35 +435,33 @@ public class DefaultFileHandler implements FileHandler {
      * @param pDC    The dublin core datastream to retrieve the data from
      */
     protected void addDCEntries(final SWORDEntry pEntry, final DublinCore pDC) {
-        Iterator<String> tCategoryIter = pDC.getSubject().iterator();
-        while (tCategoryIter.hasNext()) {
-            pEntry.addCategory(tCategoryIter.next());
+        for (String s : pDC.getSubject()) {
+            pEntry.addCategory(s);
         }
 
-        Iterator<String> tRightsIter = pDC.getRights().iterator();
-        StringBuffer tRightsStr = new StringBuffer();
-        while (tRightsIter.hasNext()) {
-            tRightsStr.append(tRightsIter.next());
+        StringBuilder tRightsStr = new StringBuilder();
+        for (String s : pDC.getRights()) {
+            tRightsStr.append(s);
         }
+
         Rights tRights = new Rights();
         tRights.setContent(tRightsStr.toString());
         pEntry.setRights(tRights);
 
-        Iterator<String> tDescriptionIter = pDC.getDescription().iterator();
-        StringBuffer tDescriptionStr = new StringBuffer();
-        while (tDescriptionIter.hasNext()) {
-            tDescriptionStr.append(tDescriptionIter.next());
+        StringBuilder tDescriptionStr = new StringBuilder();
+        for (String s : pDC.getDescription()) {
+            tDescriptionStr.append(s);
         }
 
         Summary tSummary = new Summary();
         tSummary.setContent(tDescriptionStr.toString());
         pEntry.setSummary(tSummary);
 
-        Iterator<String> tTitleIter = pDC.getTitle().iterator();
-        StringBuffer tTitleStr = new StringBuffer();
-        while (tTitleIter.hasNext()) {
-            tTitleStr.append(tTitleIter.next());
+        StringBuilder tTitleStr = new StringBuilder();
+        for (String s : pDC.getTitle()) {
+            tTitleStr.append(s);
         }
+
         Title tTitle = new Title();
         tTitle.setContent(tTitleStr.toString());
         pEntry.setTitle(tTitle);
@@ -508,9 +528,9 @@ public class DefaultFileHandler implements FileHandler {
     // Needs to return not just a valid file name but specifically an "NCName" (a "non-colonized XML name")	in order to produce valid FoxML
     protected String getValidFileName(final String pName) {
         String tFilename;
-        StringBuffer tFilenameBuffer = new StringBuffer();
+        StringBuilder tFilenameBuffer = new StringBuilder();
         char initial = pName.charAt(0);
-        if (!(initial == '_') && !isLetter(initial)) {
+        if (initial != '_' && !isLetter(initial)) {
             // initial does not start with either an underscore or a letter (as it must), so prepend a valid prefix.
             LOG.debug("datastream name must begin with a letter or _");
             tFilenameBuffer.append("Uploaded-");
@@ -545,6 +565,10 @@ public class DefaultFileHandler implements FileHandler {
      */
     private boolean charIn(char c, int start, int end) {
         return c >= start && c <= end;
+    }
+
+    private String emptyIfNull(String s) {
+        return (s == null) ? "" : s;
     }
 
     /**

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2007, Aberystwyth University
  *
  * All rights reserved.
@@ -63,138 +63,145 @@ import java.net.URISyntaxException;
  *
  * @author Glen Robson
  * @version 1.0
- * @since 18 October 2007
  */
-public class LocalDatastream extends Datastream {
-	private static final Logger LOG = Logger.getLogger(LocalDatastream.class);
-	private String _path = "";
-	private String _uploadedURL = null;
-	private boolean cleanup = true;
+public class LocalDatastream extends Datastream implements URLContentLocationDatastream {
+    private static final Logger LOG = Logger.getLogger(LocalDatastream.class);
+    private String _path = "";
+    private String _uploadedURL = null;
+    private boolean cleanup = true;
 
-	/**
-	 * @param pID       Datastream ID
-	 * @param pMimeType Mime type
-	 * @param pPath     The absolute path for the datastream
-	 */
-	public LocalDatastream(final String pID, final String pMimeType, final String pPath) {
-		super(pID, State.ACTIVE, ControlGroup.MANAGED, pMimeType);
-		super.setLabel("SWORD Generic File Upload");
-		this.setPath(pPath);
-	}
+    /**
+     * @param pID       Datastream ID
+     * @param pMimeType Mime type
+     * @param pPath     The absolute path for the datastream
+     */
+    public LocalDatastream(final String pID, final String pMimeType, final String pPath) {
+        super(pID, State.ACTIVE, ControlGroup.MANAGED, pMimeType);
+        super.setLabel("SWORD Generic File Upload");
+        this.setPath(pPath);
+    }
 
-	public String getPath() {
-		return _path;
-	}
+    public String getPath() {
+        return _path;
+    }
 
-	public void setPath(final String pPath) {
-		_path = pPath;
-	}
+    public void setPath(final String pPath) {
+        _path = pPath;
+    }
 
-	/**
-	 * This uploads the datastream to Fedora so that it is accessible on ingest
-	 *
-	 * @param pUsername Username for fedora repository
-	 * @param pPassword Password for fedora repository
-	 * @throws IOException    if there are problems accessing the file
-	 * @throws SWORDException if there are problems contacting the repository
-	 */
-	public void upload(final String pUsername, final String pPassword) throws IOException, SWORDException {
-		// Ensure no one uploads same object twice
-		if (_uploadedURL != null) return;
+    /**
+     * This uploads the datastream to Fedora so that it is accessible on ingest
+     *
+     * @param pUsername Username for fedora repository
+     * @param pPassword Password for fedora repository
+     * @throws IOException    if there are problems accessing the file
+     * @throws SWORDException if there are problems contacting the repository
+     */
+    public void upload(final String pUsername, final String pPassword) throws IOException, SWORDException {
+        // Ensure no one uploads same object twice
+        if (_uploadedURL != null) return;
 
-		File file = getFileInstance();
-		if (!file.exists()) {
-			final String message = "File '" + file.getAbsolutePath() + "' doesn't exist";
-			LOG.error(message);
-			throw new IOException(message);
-		}
+        File file = getFileInstance();
+        if (!file.exists()) {
+            final String message = "File '" + file.getAbsolutePath() + "' doesn't exist";
+            LOG.error(message);
+            throw new IOException(message);
+        }
 
-		final String fedoraUploadUrl = new XMLProperties().getFedoraURL() + "/management/upload";
-		String body = uploadFollowRedirects(fedoraUploadUrl, pUsername, pPassword, file);
-		_uploadedURL = body.trim().replaceAll("\n", "");
+        final String fedoraUploadUrl = new XMLProperties().getFedoraURL() + "/management/upload";
+        String body = uploadFollowRedirects(fedoraUploadUrl, pUsername, pPassword, file);
+        _uploadedURL = body.trim().replaceAll("\n", "");
 
-		if (cleanup) {
-			LOG.info("Deleting temporary upload file " + _path);
-			file.delete();
-		}
-	}
+        if (cleanup) {
+            LOG.info("Deleting temporary upload file " + _path);
+            file.delete();
+        }
+    }
 
-	public boolean isCleanup() {
-		return cleanup;
-	}
+    public boolean isCleanup() {
+        return cleanup;
+    }
 
-	/**
-	 * Configure if the source file should be deleted after it was successfully uploaded to Fedora.
-	 * Default is `true`.
-	 *
-	 * @param cleanup True, if the source file should be deleted after successful upload.
-	 */
-	public void setCleanup(boolean cleanup) {
-		this.cleanup = cleanup;
-	}
+    /**
+     * Configure if the source file should be deleted after it was successfully uploaded to Fedora.
+     * Default is `true`.
+     *
+     * @param cleanup True, if the source file should be deleted after successful upload.
+     */
+    public void setCleanup(boolean cleanup) {
+        this.cleanup = cleanup;
+    }
 
-	protected String uploadFollowRedirects(final String pURL, final String pUsername, final String pPassword, File file) throws IOException {
-		HttpClient tClient = new HttpClient();
-		tClient.getParams().setAuthenticationPreemptive(true);
+    protected String uploadFollowRedirects(final String pURL, final String pUsername, final String pPassword, File file) throws IOException {
+        HttpClient tClient = new HttpClient();
+        tClient.getParams().setAuthenticationPreemptive(true);
 
-		Credentials tUserPass = new UsernamePasswordCredentials(pUsername, pPassword);
-		tClient.getState().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM), tUserPass);
+        Credentials tUserPass = new UsernamePasswordCredentials(pUsername, pPassword);
+        tClient.getState().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM), tUserPass);
 
-		// execute and get the response
-		LOG.info("Uploading " + this.getPath() + " to " + pURL);
-		PostMethod tPost = new PostMethod(pURL);
-		tPost.getParams().setParameter("Connection", "Keep-Alive");
+        // execute and get the response
+        LOG.info("Uploading " + this.getPath() + " to " + pURL);
+        PostMethod tPost = new PostMethod(pURL);
+        tPost.getParams().setParameter("Connection", "Keep-Alive");
 
-		LOG.debug("Content length: " + tPost.getRequestHeader("Content-length") + " content type " + tPost.getRequestHeader("Content-Type"));
-		tPost.setContentChunked(true);
+        LOG.debug("Content length: " + tPost.getRequestHeader("Content-length") + " content type " + tPost.getRequestHeader("Content-Type"));
+        tPost.setContentChunked(true);
 
-		// add the file part
-		Part[] parts = {new FilePart("file", file)};
-		tPost.setRequestEntity(new MultipartRequestEntity(parts, tPost.getParams()));
-		LOG.debug("Multipart length: " + tPost.getRequestEntity().getContentLength());
+        // add the file part
+        Part[] parts = {new FilePart("file", file)};
+        tPost.setRequestEntity(new MultipartRequestEntity(parts, tPost.getParams()));
+        LOG.debug("Multipart length: " + tPost.getRequestEntity().getContentLength());
 
-		int responseCode = tClient.executeMethod(tPost);
-		if (responseCode >= 300 && responseCode <= 399) {
-			Header tLocationHeader = tPost.getResponseHeader("location");
-			// Redirected
-			return this.uploadFollowRedirects(tLocationHeader.getValue(), pUsername, pPassword, file);
-		}
+        int responseCode = tClient.executeMethod(tPost);
+        if (responseCode >= 300 && responseCode <= 399) {
+            Header tLocationHeader = tPost.getResponseHeader("location");
+            // Redirected
+            return this.uploadFollowRedirects(tLocationHeader.getValue(), pUsername, pPassword, file);
+        }
 
-		if (responseCode != 201) {
-			LOG.error("Couldn't upload " + this.getPath() + " none 201 result: " + responseCode);
-			throw new IOException("Couldn't upload file: " + this.getPath());
-		}
+        if (responseCode != 201) {
+            LOG.error("Couldn't upload " + this.getPath() + " none 201 result: " + responseCode);
+            throw new IOException("Couldn't upload file: " + this.getPath());
+        }
 
-		return tPost.getResponseBodyAsString();
-	}
+        return tPost.getResponseBodyAsString();
+    }
 
-	/**
-	 * Converts this datastream into FOXML so it can be ingested.
-	 *
-	 * @param namespace The FOXML namespace
-	 * @return Element the FOXML datastream node
-	 */
-	public Element dsToFOXML(final Namespace namespace) {
-		if (_uploadedURL == null) {
-			throw new IllegalArgumentException("Please upload the datastream before ingesting");
-		}
-		Element tContentLocation = new Element("contentLocation", namespace);
-		tContentLocation.setAttribute("TYPE", "URL");
-		tContentLocation.setAttribute("REF", _uploadedURL);
-		return tContentLocation;
-	}
+    /**
+     * Converts this datastream into FOXML so it can be ingested.
+     *
+     * @param namespace The FOXML namespace
+     * @return Element the FOXML datastream node
+     */
+    public Element dsToFOXML(final Namespace namespace) {
+        if (_uploadedURL == null) {
+            throw new IllegalArgumentException("Please upload the datastream before ingesting");
+        }
+        Element tContentLocation = new Element("contentLocation", namespace);
+        tContentLocation.setAttribute("TYPE", "URL");
+        tContentLocation.setAttribute("REF", _uploadedURL);
+        return tContentLocation;
+    }
 
-	private File getFileInstance() throws IOException {
-		File file;
-		if (_path.startsWith("file:")) {
-			try {
-				file = new File(new URI(_path));
-			} catch (URISyntaxException e) {
-				throw new IOException("File URI is not valid: " + _path);
-			}
-		} else {
-			file = new File(_path);
-		}
-		return file;
-	}
+    public String getURL() {
+        return _uploadedURL;
+    }
+
+    public void setURL(String pURL) {
+        _uploadedURL = pURL;
+    }
+
+    private File getFileInstance() throws IOException {
+        File file;
+        if (_path.startsWith("file:")) {
+            try {
+                file = new File(new URI(_path));
+            } catch (URISyntaxException e) {
+                throw new IOException("File URI is not valid: " + _path);
+            }
+        } else {
+            file = new File(_path);
+        }
+        return file;
+    }
 }

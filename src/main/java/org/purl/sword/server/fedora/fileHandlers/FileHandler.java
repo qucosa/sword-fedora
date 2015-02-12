@@ -68,4 +68,14 @@ public interface FileHandler {
      * @throws SWORDException if any problem occurred during ingest
      */
     public SWORDEntry ingestDeposit(final DepositCollection pDeposit, final ServiceDocument pServiceDocument) throws SWORDException;
+
+    /**
+     * Update an previously ingested deposit by using the given deposit.
+     *
+     * @param depositCollection The deposit and its associated collection referencing the deposit to update
+     * @param serviceDocument   The service document which this request applies to
+     * @return SWORD entry document describing the result
+     * @throws SWORDException If any problem occurred during ingest
+     */
+    public SWORDEntry updateDeposit(DepositCollection depositCollection, ServiceDocument serviceDocument) throws SWORDException;
 }
