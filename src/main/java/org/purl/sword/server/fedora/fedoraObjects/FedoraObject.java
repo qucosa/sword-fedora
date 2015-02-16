@@ -139,7 +139,7 @@ public class FedoraObject {
         List<Element> tDatastreamsList = new ArrayList<Element>();
         tDatastreamsList.add(dc.toFOXML(NS_FOXML));
 
-        if (fedora3compatibility) {
+        if (!fedora3compatibility) {
             relsext.removeFedoraModelsOnSerialization(true);
         }
         tDatastreamsList.add(relsext.toFOXML(NS_FOXML));
