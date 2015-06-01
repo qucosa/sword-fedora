@@ -84,8 +84,8 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
             throw new CRUDObjectNotFoundException("Object " + objectPID + " not found");
         }
 
-        setObjectState(objectPID, fsr, "D", "Deleted on behalf of " + onBehalfOf);
-        log.debug("Set object state to deleted: " + objectPID);
+        setObjectState(objectPID, fsr, deleteRequest.getDesiredState(), "State change on behalf of " + onBehalfOf);
+        log.debug("Set object state for " + objectPID + " to '" + deleteRequest.getDesiredState() + "'");
 
         safeDeleteCachedResponse(collectionPID, objectPID);
     }
@@ -202,12 +202,12 @@ public class CRUDFedoraServer extends FedoraServer implements CRUDSWORDServer {
     }
 
     private class RequestInfo {
-        private String location;
         private String collectionPID;
+        private String location;
         private String objectPID;
         private String onBehalfOf;
-        private String username;
         private String password;
+        private String username;
 
         public RequestInfo(DeleteRequest dr) {
             location = dr.getLocation();

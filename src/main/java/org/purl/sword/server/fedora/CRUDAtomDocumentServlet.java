@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
     private static Logger log = Logger.getLogger(CRUDAtomDocumentServlet.class);
@@ -129,9 +130,10 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         DeleteRequest deleteRequest = new DeleteRequest();
         setAuthenticationDetails(request, deleteRequest);
         deleteRequest.setIPAddress(request.getRemoteAddr());
-        deleteRequest.setLocation(getUrl(request));
+        deleteRequest.setLocation(request.getRequestURI());
         setOnBehalfHeader(request, deleteRequest);
         setXNOOPHeader(request, deleteRequest);
+        setDesiredState(request, deleteRequest);
         return deleteRequest;
     }
 
@@ -271,6 +273,17 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
         } else {
             throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
         }
+    }
+
+    private void setDesiredState(HttpServletRequest request, DeleteRequest deleteRequest) {
+        String state = "D";
+        Map params = request.getParameterMap();
+        if (params.containsKey("inactivate")) {
+            state = "I";
+        } else if (params.containsKey("revert")) {
+            state = "A";
+        }
+        deleteRequest.setDesiredState(state);
     }
 
     private void writeResponseContent(HttpServletResponse response, DepositResponse depositResponse) throws IOException {

@@ -40,12 +40,13 @@ package org.purl.sword.server.fedora.baseExtensions;
  * POJO containing DELETE request information
  */
 public class DeleteRequest {
-    private String username;
-    private String onBehalfOf;
-    private String password;
     private String IPAddress;
+    private String desiredState;
     private String location;
     private boolean noOp;
+    private String onBehalfOf;
+    private String password;
+    private String username;
 
     public String getUsername() {
         return username;
@@ -93,5 +94,13 @@ public class DeleteRequest {
 
     public void setNoOp(boolean noOp) {
         this.noOp = noOp;
+    }
+
+    public String getDesiredState() {
+        return desiredState;
+    }
+
+    public void setDesiredState(String desiredState) {
+        this.desiredState = desiredState;
     }
 }
