@@ -43,6 +43,7 @@ import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.DatastreamDef;
 import org.fcrepo.server.types.gen.RepositoryInfo;
+import org.fcrepo.server.types.gen.Validation;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -111,6 +112,14 @@ public class FedoraRepository {
             return _APIM.getNextPID(BigInteger.valueOf(1), configuration.getPIDNamespace()).get(0);
         } catch (Exception e) {
             throw new SWORDException("Problems retrieving the next pid from the repository: ", e);
+        }
+    }
+
+    public Validation validate(FedoraObject obj) throws SWORDException {
+        try {
+            return _APIM.validate(obj.getPid(), null);
+        } catch (Exception e) {
+            throw new SWORDException("Problems validating an object: ", e);
         }
     }
 
