@@ -55,6 +55,8 @@ public abstract class Datastream {
 	protected String _createDate = null;
 	protected String _label = null;
 	protected boolean _versionable = true;
+	private String digest = "none";
+	private String digestType = "DISABLED";
 
 	public Datastream(final String pID, final State pState, final ControlGroup pControlGroup, final String pMimeType) {
 		this(pID, pState, pControlGroup, pMimeType, null, null, true);
@@ -229,8 +231,10 @@ public abstract class Datastream {
 
 		Element tContentDigest = new Element("contentDigest", FOXML);
 		tDatastreamVersion.addContent(tContentDigest);
-		tContentDigest.setAttribute("TYPE", "DISABLED");
-		tContentDigest.setAttribute("DIGEST", "none");
+		String digestType = this.getDigestType();
+		String digest = this.getDigest();
+		tContentDigest.setAttribute("TYPE", digestType);
+		tContentDigest.setAttribute("DIGEST", digest);
 
 		tDatastreamVersion.addContent(this.dsToFOXML(FOXML));
 		
@@ -238,5 +242,20 @@ public abstract class Datastream {
 	}
 
 	public abstract Element dsToFOXML(final Namespace FOXML);
-	
-}	
+
+	public String getDigestType() {
+		return digestType;
+	}
+
+	public String getDigest() {
+		return digest;
+	}
+
+	public void setDigest(String digest) {
+		this.digest = digest;
+	}
+
+	public void setDigestType(String digestType) {
+		this.digestType = digestType;
+	}
+}
