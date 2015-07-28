@@ -216,7 +216,7 @@ public abstract class Datastream {
 		tDatastream.setAttribute("ID", this.getId());
 		tDatastream.setAttribute("STATE", this.getState().toString());
 		tDatastream.setAttribute("CONTROL_GROUP", this.getControlGroup().toString());
-		tDatastream.setAttribute("VERSIONABLE", "true");
+		tDatastream.setAttribute("VERSIONABLE", String.valueOf(isVersionable()));
 
 		Element tDatastreamVersion = new Element("datastreamVersion", FOXML);
 		tDatastream.addContent(tDatastreamVersion);
