@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.Normalizer;
 
 /**
  * This encapsulates datastreams which are on the local file system
@@ -195,7 +196,11 @@ public class LocalDatastream extends Datastream implements URLContentLocationDat
         File file;
         if (_path.startsWith("file:")) {
             try {
-                file = new File(new URI(_path));
+                file = tryNormalizedFilename(_path, Normalizer.Form.NFC);
+                if (!file.exists()) {
+                    LOG.warn("Could'nt find file by NFC normalized file name. Fallback to NFD normalization...");
+                    file = tryNormalizedFilename(_path, Normalizer.Form.NFD);
+                }
             } catch (URISyntaxException e) {
                 throw new IOException("File URI is not valid: " + _path);
             }
@@ -203,5 +208,9 @@ public class LocalDatastream extends Datastream implements URLContentLocationDat
             file = new File(_path);
         }
         return file;
+    }
+
+    private File tryNormalizedFilename(String path, Normalizer.Form form) throws URISyntaxException {
+        return new File(new URI(Normalizer.normalize(path, form)));
     }
 }
