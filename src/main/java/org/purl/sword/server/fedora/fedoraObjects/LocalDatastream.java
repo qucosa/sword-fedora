@@ -196,11 +196,7 @@ public class LocalDatastream extends Datastream implements URLContentLocationDat
         File file;
         if (_path.startsWith("file:")) {
             try {
-                file = tryNormalizedFilename(_path, Normalizer.Form.NFC);
-                if (!file.exists()) {
-                    LOG.warn("Could'nt find file by NFC normalized file name. Fallback to NFD normalization...");
-                    file = tryNormalizedFilename(_path, Normalizer.Form.NFD);
-                }
+                file = getFileByURI(_path);
             } catch (URISyntaxException e) {
                 throw new IOException("File URI is not valid: " + _path);
             }
@@ -210,7 +206,17 @@ public class LocalDatastream extends Datastream implements URLContentLocationDat
         return file;
     }
 
-    private File tryNormalizedFilename(String path, Normalizer.Form form) throws URISyntaxException {
-        return new File(new URI(Normalizer.normalize(path, form)));
+    private File getFileByURI(String fileUri) throws URISyntaxException {
+        File file = new File(new URI(fileUri));
+        if (file.exists()) return file;
+
+        LOG.warn("Could'nt find file by URI. Trying NFC normalized file URI...");
+        file = new File(new URI(Normalizer.normalize(fileUri, Normalizer.Form.NFC)));
+        if (file.exists()) return file;
+
+        LOG.warn("Could'nt find file by NFC normalized file name. Fallback to NFD normalization...");
+        file = new File(new URI(Normalizer.normalize(fileUri, Normalizer.Form.NFD)));
+        return file;
     }
+
 }
