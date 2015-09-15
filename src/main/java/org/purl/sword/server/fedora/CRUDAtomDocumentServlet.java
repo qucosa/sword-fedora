@@ -71,7 +71,7 @@ public class CRUDAtomDocumentServlet extends AtomDocumentServlet {
                 log.error(e.getMessage());
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             } catch (SWORDAuthenticationException e) {
-                log.error(e.getMessage());
+                log.warn(e.getMessage());
                 // Ask for credentials again
                 String s = "Basic realm=\"SWORD\"";
                 response.setHeader("WWW-Authenticate", s);
