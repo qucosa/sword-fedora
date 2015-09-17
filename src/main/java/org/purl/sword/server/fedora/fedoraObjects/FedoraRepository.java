@@ -52,6 +52,8 @@ import org.purl.sword.server.fedora.utils.XMLProperties;
 
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
@@ -68,14 +70,12 @@ import java.util.Map;
  */
 public class FedoraRepository {
     private static final Logger log = Logger.getLogger(FedoraRepository.class);
-
-    private FedoraAPIM _APIM = null;
     private FedoraAPIA _APIA = null;
+    private FedoraAPIM _APIM = null;
     private XMLProperties configuration = null;
-
-    private String username = null;
-    private String password = null;
     private String fedoraVersion = null;
+    private String password = null;
+    private String username = null;
 
     /**
      * Initialize Fedora repository for connecting.
@@ -226,53 +226,60 @@ public class FedoraRepository {
      * @throws SWORDException if something goes wrong
      */
     public void addDatastream(String pid, Datastream ds, String logMessage) throws SWORDException {
-        uploadDatastreamIfLocal(ds);
-        if (ds instanceof URLContentLocationDatastream) {
-            _APIM.addDatastream(
-                    pid,
-                    ds.getId(),
-                    null,
-                    ds.getLabel(),
-                    ds.isVersionable(),
-                    ds.getMimeType(),
-                    null,
-                    ((URLContentLocationDatastream) ds).getURL(),
-                    ds.getControlGroup().toString(),
-                    ds.getState().toString(),
-                    "DISABLED",
-                    null,
-                    logMessage);
-        } else if (ds instanceof InlineDatastream) {
-            _APIM.addDatastream(
-                    pid,
-                    ds.getId(),
-                    null,
-                    ds.getLabel(),
-                    ds.isVersionable(),
-                    ds.getMimeType(),
-                    null,
-                    null,
-                    ds.getControlGroup().toString(),
-                    ds.getState().toString(),
-                    "DISABLED",
-                    null,
-                    "[creation] " + logMessage);
-            byte[] content = serializeContent((InlineDatastream) ds);
-            _APIM.modifyDatastreamByValue(
-                    pid,
-                    ds.getId(),
-                    null,
-                    ds.getLabel(),
-                    ds.getMimeType(),
-                    null,
-                    content,
-                    null,
-                    null,
-                    "[content] " + logMessage,
-                    false);
-        } else {
-            throw new SWORDException("Unknown datastream type");
+        Datastream tds = ds;
+
+        if (ds instanceof InlineDatastream) {
+            // Workaround for `APIM cannot upload inline datastreams`
+            tds = makeLocalDatastream((InlineDatastream) ds);
         }
+
+        uploadDatastreamIfLocal(tds);
+
+        _APIM.addDatastream(
+                pid,
+                tds.getId(),
+                null,
+                tds.getLabel(),
+                tds.isVersionable(),
+                tds.getMimeType(),
+                null,
+                ((URLContentLocationDatastream) tds).getURL(),
+                tds.getControlGroup().toString(),
+                tds.getState().toString(),
+                "DISABLED",
+                null,
+                "[creation] " + logMessage);
+    }
+
+    private LocalDatastream makeLocalDatastream(InlineDatastream ds) throws SWORDException {
+        File tempFile;
+
+        try {
+            tempFile = File.createTempFile(String.valueOf(ds.hashCode()), null);
+        } catch (IOException e) {
+            throw new SWORDException("Cannot create temporary file: " + e.getMessage());
+        }
+
+        try (FileOutputStream fout = new FileOutputStream(tempFile)) {
+            fout.write(serializeContent(ds));
+            fout.flush();
+        } catch (IOException e) {
+            throw new SWORDException(
+                    String.format("Cannot write temporary to file '%s': %s ",
+                            tempFile.getAbsolutePath(),
+                            e.getMessage()));
+        }
+
+        LocalDatastream lds = new LocalDatastream(
+                ds.getId(),
+                ds.getMimeType(),
+                tempFile.getAbsolutePath());
+        lds.setLabel(ds.getLabel());
+        lds.setVersionable(ds.isVersionable());
+        lds.setControlGroup(ds.getControlGroup());
+        lds.setState(ds.getState());
+
+        return lds;
     }
 
     /**
