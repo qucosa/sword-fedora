@@ -71,12 +71,15 @@ public abstract class Datastream {
 	 * @param String Label
 	 * @param boolean whether updates to this object will over right the original or if a new version will be created
 	 */
-	public Datastream(final String pID, final State pState, final ControlGroup pControlGroup, final String pMimeType, final String pDate, final String pLabel, final boolean pVersionable) {
-		this.setId(pID);
-		this.setState(pState);
-		this.setControlGroup(pControlGroup);
-		this.setMimeType(pMimeType);
-		this.setCreateDate(pDate);
+	public Datastream(final String pID, final State pState, final ControlGroup pControlGroup, final String pMimeType, final String pDate,
+					  final String pLabel, final boolean pVersionable) {
+		_id = pID;
+		_state = pState;
+		_controlGroup = pControlGroup;
+		_mimeType = pMimeType;
+		_createDate = pDate;
+		_label = pLabel;
+		_versionable = pVersionable;
 	}
 	
 	
