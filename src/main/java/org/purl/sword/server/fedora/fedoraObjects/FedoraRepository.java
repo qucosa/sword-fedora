@@ -42,19 +42,18 @@ import org.apache.log4j.Logger;
 import org.fcrepo.server.access.FedoraAPIA;
 import org.fcrepo.server.management.FedoraAPIM;
 import org.fcrepo.server.types.gen.DatastreamDef;
+import org.fcrepo.server.types.gen.MIMETypedStream;
 import org.fcrepo.server.types.gen.RepositoryInfo;
 import org.fcrepo.server.types.gen.Validation;
 import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.purl.sword.base.SWORDException;
 import org.purl.sword.server.fedora.utils.XMLProperties;
 
 import javax.xml.ws.BindingProvider;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -249,6 +248,27 @@ public class FedoraRepository {
                 "DISABLED",
                 null,
                 "[creation] " + logMessage);
+    }
+
+    /**
+     * Return a datastream object that holds the content of a datastream.
+     *
+     * @param pid  ID of an object
+     * @param dsid ID of a datastream
+     * @return Inline XML datastream holding content dissemination
+     * @throws SWORDException if something goes wrong
+     */
+    public Datastream getDatastream(String pid, String dsid) {
+        MIMETypedStream datastream = _APIA.getDatastreamDissemination(pid, dsid, "");
+        try {
+            ByteArrayInputStream in = new ByteArrayInputStream(datastream.getStream());
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(in);
+            return new XMLInlineDatastream(dsid, document);
+        } catch (Exception _) {
+            log.error("Could not read datastream", _);
+            return null;
+        }
     }
 
     private LocalDatastream makeLocalDatastream(InlineDatastream ds) throws SWORDException {
