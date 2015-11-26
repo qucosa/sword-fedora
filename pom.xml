@@ -29,7 +29,7 @@
     <groupId>sword</groupId>
     <artifactId>sword-fedora</artifactId>
     <packaging>war</packaging>
-    <version>1.6.0-SNAPSHOT</version>
+    <version>1.6.0</version>
     <name>SWORD Service for Fedora Commons 3.x</name>
 
     <dependencies>
