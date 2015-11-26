@@ -103,7 +103,7 @@ public class FileHandlerFactory {
             try {
                 FileHandler fileHandler = fileHandlerClass.newInstance();
                 if (fileHandler.isHandled(pContentType, pPackaging)) {
-                    LOG.debug("Found handler " + fileHandlerClass.getClass().getName());
+                    LOG.debug("Found handler " + fileHandler.getClass().getName());
                     return fileHandler;
                 }
             } catch (ReflectiveOperationException e) {
