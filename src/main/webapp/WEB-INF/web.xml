@@ -41,10 +41,12 @@
   <servlet>
     <servlet-name>servicedocument</servlet-name>
     <servlet-class>org.purl.sword.server.ServiceDocumentServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <servlet-name>deposit</servlet-name>
     <servlet-class>org.purl.sword.server.fedora.CRUDAtomDocumentServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
   </servlet>
 
 <!-- Servlet Mappings -->
