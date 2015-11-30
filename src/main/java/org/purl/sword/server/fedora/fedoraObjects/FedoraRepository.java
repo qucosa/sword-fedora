@@ -181,6 +181,7 @@ public class FedoraRepository {
     public void modifyDatastream(String pid, Datastream update, String logMessage) throws SWORDException {
         uploadDatastreamIfLocal(update);
         org.fcrepo.server.types.gen.Datastream original = _APIM.getDatastream(pid, update.getId(), null);
+
         if (update instanceof InlineDatastream) {
             byte[] content = serializeContent((InlineDatastream) update);
             _APIM.modifyDatastreamByValue(
@@ -195,7 +196,14 @@ public class FedoraRepository {
                     original.getChecksum(),
                     logMessage,
                     false);
-        } else if (update instanceof URLContentLocationDatastream) {
+        } else {
+            final String contentLocationUrl =
+                    (update instanceof URLContentLocationDatastream) ?
+                            ((URLContentLocationDatastream) update).getURL() : null;
+            final String checksum =
+                    (contentLocationUrl != null) ?
+                            original.getChecksum() : null;
+
             _APIM.modifyDatastreamByReference(
                     pid,
                     update.getId(),
@@ -203,13 +211,11 @@ public class FedoraRepository {
                     update.getLabel(),
                     update.getMimeType(),
                     original.getFormatURI(),
-                    ((URLContentLocationDatastream) update).getURL(),
+                    contentLocationUrl,
                     original.getChecksumType(),
-                    original.getChecksum(),
+                    checksum,
                     logMessage,
                     false);
-        } else {
-            throw new SWORDException("Unknown datastream type");
         }
     }
 
