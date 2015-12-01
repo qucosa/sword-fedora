@@ -265,8 +265,8 @@ public class FedoraRepository {
      * @throws SWORDException if something goes wrong
      */
     public Datastream getDatastream(String pid, String dsid) {
-        MIMETypedStream datastream = _APIA.getDatastreamDissemination(pid, dsid, "");
         try {
+            MIMETypedStream datastream = _APIA.getDatastreamDissemination(pid, dsid, "");
             ByteArrayInputStream in = new ByteArrayInputStream(datastream.getStream());
             SAXBuilder saxBuilder = new SAXBuilder();
             Document document = saxBuilder.build(in);
