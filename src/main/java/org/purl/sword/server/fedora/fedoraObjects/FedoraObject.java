@@ -56,6 +56,7 @@ public class FedoraObject {
     private Relationship relsext;
     private List<Datastream> datastreams;
     private List<Disseminator> disseminators;
+    private State state;
 
     public FedoraObject(String pid) {
         this.pid = pid;
@@ -160,6 +161,11 @@ public class FedoraObject {
 
     private Element getObjectPropsXML(boolean fedora3compatibility) {
         Element tObjectPropsEl = new Element("objectProperties", NS_FOXML);
+
+        if (state != null) {
+            tObjectPropsEl.addContent(new Property("info:fedora/fedora-system:def/model#state", state.toString()).toFOXML(NS_FOXML));
+        }
+
         for (Property tProp : this.getIdentifiers()) {
             if (fedora3compatibility && tProp.getName().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
                 continue;
@@ -169,4 +175,11 @@ public class FedoraObject {
         return tObjectPropsEl;
     }
 
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
 }

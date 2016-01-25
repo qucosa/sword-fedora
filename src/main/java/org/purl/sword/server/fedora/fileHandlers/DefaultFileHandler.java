@@ -213,7 +213,6 @@ public class DefaultFileHandler implements FileHandler {
         List<Property> tIdentifiers = new ArrayList<Property>();
 
         tIdentifiers.add(new Property("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "FedoraObject"));
-        tIdentifiers.add(new Property("info:fedora/fedora-system:def/model#state", "Active"));
         tIdentifiers.add(new Property("info:fedora/fedora-system:def/model#label", "Object created through the SWORD deposit system"));
 
         String userName = (pDeposit.getOnBehalfOf() != null) ? pDeposit.getOnBehalfOf() : pDeposit.getUsername();
