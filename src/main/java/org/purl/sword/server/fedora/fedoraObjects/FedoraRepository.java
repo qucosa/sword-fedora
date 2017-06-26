@@ -193,16 +193,13 @@ public class FedoraRepository {
                     original.getFormatURI(),
                     content,
                     original.getChecksumType(),
-                    original.getChecksum(),
+                    null,
                     logMessage,
                     false);
         } else {
             final String contentLocationUrl =
                     (update instanceof URLContentLocationDatastream) ?
                             ((URLContentLocationDatastream) update).getURL() : null;
-            final String checksum =
-                    (contentLocationUrl != null) ?
-                            original.getChecksum() : null;
 
             _APIM.modifyDatastreamByReference(
                     pid,
@@ -213,7 +210,7 @@ public class FedoraRepository {
                     original.getFormatURI(),
                     contentLocationUrl,
                     original.getChecksumType(),
-                    checksum,
+                    null,
                     logMessage,
                     false);
         }
